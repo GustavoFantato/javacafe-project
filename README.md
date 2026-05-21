@@ -1,5 +1,7 @@
 # javacafe-project
 
+Java Version: JDK 21
+
 ```shell
  $ tree
     java-cafe-pos/
@@ -11,7 +13,6 @@
         └── src/
         └── main/
         ├── java/                       # Código Java direto na raiz, sem com/javacafe/
-        │   ├── controller.Main.java               # Ponto de entrada do sistema
         │   ├── module-info.java        # Configuração de módulos do JavaFX
         │   │
         │   ├── model/                  # Entidades (Classes puras)
@@ -30,7 +31,8 @@
         │   └── controller/             # Controladores da Interface Gráfica
         │       ├── OrderEntryController.java
         │       ├── InventoryController.java
-        │       └── ReportsController.java
+        │       ├── ReportsController.java
+        │       └── Main.java               # Ponto de entrada do sistema
         │
         └── resources/                  # Arquivos visuais organizados direto na raiz
         ├── fxml/
