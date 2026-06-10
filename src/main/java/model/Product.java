@@ -1,6 +1,7 @@
 package model;
 
 import exception.OutOfStockException;
+import model.Enums.Size;
 
 public class Product{
     // Attributes
@@ -9,15 +10,17 @@ public class Product{
     private int stockQtd;
     private String imagePath;
     private Size size;
+    private String description;
 
 
     // Constructor
-    public Product(String name, double price, int stockQtd, String imagePath, Size size){
+    public Product(String name, double price, int stockQtd, String imagePath, Size size, String description){
         this.name = name;
         this.price = price;
         this.stockQtd = stockQtd;
         this.imagePath = imagePath;
         this.size = size;
+        this.description = description;
     }
 
 
@@ -58,6 +61,9 @@ public class Product{
     public Size getSize() {
         return size;
     }
+    public String getDescription() {
+        return description;
+    }
 
     // Setters
     private void setStockQtd(int stockQtd) {
@@ -75,5 +81,8 @@ public class Product{
     }
     public void setSize(Size size) {
         this.size = size;
+    }
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
