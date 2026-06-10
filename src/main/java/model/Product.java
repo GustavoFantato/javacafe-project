@@ -6,21 +6,23 @@ import model.Enums.Size;
 public class Product{
     // Attributes
     private String name;
+    private Size size;
     private double price;
     private int stockQtd;
     private String imagePath;
-    private Size size;
     private String description;
-
+    private static int idCounter = 0;
+    private final int ID;
 
     // Constructor
-    public Product(String name, double price, int stockQtd, String imagePath, Size size, String description){
+    public Product(int ID, String name, double price, int stockQtd, String imagePath, Size size, String description){
         this.name = name;
         this.price = price;
         this.stockQtd = stockQtd;
         this.imagePath = imagePath;
         this.size = size;
         this.description = description;
+        this.ID = ++idCounter;
     }
 
 
@@ -63,6 +65,9 @@ public class Product{
     }
     public String getDescription() {
         return description;
+    }
+    public int getID() {
+        return ID;
     }
 
     // Setters

@@ -1,0 +1,4 @@
+id,name,size,price,stock,imagePath,description
+1,Cappuccino - P,P,5.99,5,cappuccino.png,"Um cappuccino pequeno delicioso!"
+2,Cappuccino - M,M,7.99,3,cappuccino.png,"Um cappuccino medio delicioso!"
+3,Cappuccino - G,G,11.90,0,cappuccino.png,"Um cappuccino grande delicioso!"
