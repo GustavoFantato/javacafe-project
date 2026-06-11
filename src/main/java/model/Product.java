@@ -1,7 +1,7 @@
 package model;
 
 import exception.OutOfStockException;
-import model.Enums.Size;
+import model.enums.Size;
 
 public class Product{
     // Attributes
@@ -71,10 +71,10 @@ public class Product{
     }
 
     // Setters
-    private void setStockQtd(int stockQtd) {
+    public void setStockQtd(int stockQtd) {
         this.stockQtd = stockQtd;
     }
-    private void setPrice(double price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 
