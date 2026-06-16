@@ -1,0 +1,4 @@
+transactionId,timeStamp,orderId,productId,productName,qtd,unitPrice,subTotal
+footer,transactionId,timeStamp,orderId,paymentMethod,cartCost,change
+
+f,0,null,-1,null,-1,-1

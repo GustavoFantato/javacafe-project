@@ -1,8 +1,8 @@
 package service;
 
-import model.Enums.Size;
-import model.OrderItem;
+import model.enums.Size;
 import model.Product;
+import service.enums.FilterOperator;
 
 import java.io.*;
 import java.util.ArrayList; // To use the order's item list
@@ -24,8 +24,7 @@ public class InventoryService{
 
     // Methods
 
-    // Inventory manipulation methods
-
+    // CSV Archive Manipulation Methods
     // Loads all the CSV file in the inventory list
     public void loadInventory(){
 
@@ -52,17 +51,16 @@ public class InventoryService{
         }
 
     }
-
     public void saveInventory(){
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.filePath))){
 
             // Write the header
             writer.write("id,name,size,price,stock,imagePath,description");
-            writer.newLine(); // Jumps to next line
+            writer.newLine(); // Jumps to the next line
 
             for (Product p : storageList){
-                String line = String.format("%d,%s,%s,%f,%d,%s,\"%s\"",
+                String line = String.format("%d,%s,%s,%.2f,%d,%s,\"%s\"",
                         p.getID(),
                         p.getName(),
                         p.getSize().name(),
@@ -83,23 +81,144 @@ public class InventoryService{
     }
 
 
+    // Stock manipulation methods
+    public void decreaseProductStock(int id, int qtd) throws exception.OutOfStockException{
+        Product p = findProductById(id); // finds the product to decrease stock
+
+        if(p != null){
+            p.decreaseStock(qtd);
+            saveInventory(); // Already save to guarantee storage safety
+        } else {
+            System.err.println("FAIL: Product with ID " + id + "not found!");
+        }
+
+    }
+    public void increaseProductStock(int id, int qtd){
+        Product p = findProductById(id);
+
+        if(p != null){
+            p.increaseStock(qtd);
+            saveInventory();
+        } else{
+            System.err.println("FAIL: Product with ID " + id + "not found!");
+        }
+    }
 
 
+    // Filters Methods
+    public List<Product> findProductByNameFilter(List<Product> baseList,String name){
 
+        // Base list -> if the user wants to apply more than one filter. It filters based on the base list
 
+        List<Product> filtered = new ArrayList<>(); // Create a new array list to keep the filtered products
+        for (Product p : baseList){
+            if(p.getName().toLowerCase().contains(name.toLowerCase().trim())){
+                filtered.add(p);
+            }
+        }
+
+        return filtered;
+    }
+
+    public List<Product> findProductBySizeFilter(List<Product> baseList, Size size){
+
+        List<Product> filtered = new ArrayList<>(); // Create a new array list to keep the filtered products
+
+        for (Product p : baseList){
+            if(p.getSize() == size){
+                filtered.add(p);
+            }
+        }
+
+        return filtered;
+    }
+
+    public List<Product> findProductByPriceFilter(List<Product> baseList, double price, FilterOperator operator){
+        List<Product> filtered = new ArrayList<>(); // Create a new array list to keep the filtered products
+
+        for(Product p : baseList){
+            switch(operator){
+                case LESS_OR_EQUAL_THAN:
+                    if(p.getPrice() <= price){
+                        filtered.add(p);
+                    }
+                    break;
+                case GREATER_OR_EQUAL_THAN:
+                    if(p.getPrice() >= price){
+                        filtered.add(p);
+                    }
+                    break;
+                case EQUAL:
+                    if(p.getPrice() == price){
+                        filtered.add(p);
+                    }
+                    break;
+            }
+        }
+
+        return filtered;
+    }
+
+    // Adding/Removing/Updating products in DataBase
+
+    public void addProductStorage(Product newProd){
+        if(isWellFormatedProduct(newProd)){
+            storageList.add(newProd);
+            saveInventory();
+            System.out.println("LOG: Product added successfully!");
+        }else{
+            System.out.println("FAIL: Bad formated product!");
+        }
+    }
+
+    public void removeProductStorage(int id){
+        Product p = findProductById(id);
+
+        if(p != null){
+            storageList.remove(p);
+            saveInventory();
+            System.out.println("LOG: Product removed successfully!");
+        } else{System.out.println("FAIL: Product not found!");}
+
+    }
+
+    public void updateProductStorage(Product updatedProd) {
+
+        if (!isWellFormatedProduct(updatedProd)) {
+            System.err.println("FAIL: Cannot update. Product contains formatting errors!");
+            return;
+        }
+
+        Product oldProd = findProductById(updatedProd.getID());
+
+        if (oldProd == null) {
+            System.err.println("FAIL: Cannot update. Product ID " + updatedProd.getID() + " not found. ID alteration is not allowed!");
+            return;
+        }
+
+        // Updates the product
+        oldProd.setName(updatedProd.getName());
+        oldProd.setSize(updatedProd.getSize());
+        oldProd.setPrice(updatedProd.getPrice());
+        oldProd.setStockQtd(updatedProd.getStockQtd());
+        oldProd.setImagePath(updatedProd.getImagePath());
+        oldProd.setDescription(updatedProd.getDescription());
+
+        saveInventory();
+        System.out.println("LOG: Product ID " + updatedProd.getID() + " updated successfully!");
+    }
 
 
     // Getters
-    public List<Product> getStorageList() {
-        return storageList;
-    }
+    public List<Product> getStorageList(){return storageList;}
+    public String getFilePath() {return filePath;}
 
     // Auxiliary method used in loadInventory()
     private Product parseLine(String line){
         try{
-            String[] tokens = line.split(","); // split the line, using the common as split condition
+            String[] tokens = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"); // split the line, using the common as split condition
 
-            // Spliting and saving the data
+            // Splitting and saving the data
             int ID = Integer.parseInt(tokens[0].trim());
             String name = tokens[1].trim();
             Size size = Size.valueOf(tokens[2].trim().toUpperCase());
@@ -108,19 +227,65 @@ public class InventoryService{
             String imagePath = tokens[5].trim();
             String description = tokens[6].trim().replace("\"", "");
 
-            // Associating to the object
+            // Associating with the object
             return new Product(ID, name, price, stockQtd, imagePath, size, description);
         } catch (Exception e){
             // If the line isn't well formated, the code ignores it and logs it on the console, but doesn't kill the program
             System.err.println("Ignoring invalid line [storage.csv]: " + line + " -> Error: " + e.getMessage());
             return null;
         }
-
-
     }
 
+    public Product findProductById(int id){
+        for(Product p : storageList){
+            if(p.getID() == id){
+                return p;
+            }
+        }
+        return null; // product not found
+    }
 
+    // Used to add a new product in the storage
 
+    public boolean isWellFormatedProduct(Product p) {
+
+        if (p == null) {
+            System.err.println("VALIDATION FAIL: Product object is null.");
+            return false;
+        }
+
+        if (p.getID() <= 0) {
+            System.err.println("VALIDATION FAIL: ID must be greater than 0.");
+            return false;
+        }
+
+        if (p.getName() == null || p.getName().trim().isEmpty()) {
+            System.err.println("VALIDATION FAIL: Product name cannot be empty.");
+            return false;
+        }
+
+        if (p.getSize() == null) {
+            System.err.println("VALIDATION FAIL: Product size (Enum) cannot be null.");
+            return false;
+        }
+
+        if (p.getPrice() <= 0.0) {
+            System.err.println("VALIDATION FAIL: Price must be greater than 0.");
+            return false;
+        }
+
+        if (p.getStockQtd() < 0) {
+            System.err.println("VALIDATION FAIL: Stock quantity cannot be negative.");
+            return false;
+        }
+
+        if (p.getImagePath() == null || p.getImagePath().trim().isEmpty()) {
+            System.err.println("VALIDATION FAIL: Image path cannot be empty.");
+            return false;
+        }
+
+        return true;
+    }
 
 
 }
