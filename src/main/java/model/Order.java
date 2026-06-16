@@ -1,6 +1,6 @@
 package model;
 
-import model.Enums.Status;
+import model.enums.Status;
 import java.util.ArrayList; // To use the order's item list
 import java.util.List;
 

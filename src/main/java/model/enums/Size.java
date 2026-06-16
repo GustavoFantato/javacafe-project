@@ -1,4 +1,4 @@
-package model.Enums;
+package model.enums;
 
 // Product size
 public enum Size {

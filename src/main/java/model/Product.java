@@ -1,7 +1,7 @@
 package model;
 
 import exception.OutOfStockException;
-import model.Enums.Size;
+import model.enums.Size;
 
 public class Product{
     // Attributes
