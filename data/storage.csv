@@ -1,4 +1,4 @@
-id,name,size,price,stock,imagePath,description
-1,Cappuccino - P,P,5.00,95,cappuccino.png,"Um cappuccino pequeno delicioso!"
-2,Cappuccino - M,M,7.00,99,cappuccino.png,"Um cappuccino médio delicioso!"
-3,Cappuccino - G,G,11.00,90,cappuccino.png,"Um cappuccino grande delicioso!"
+id,name,size,category,price,stock,imagePath,description
+1,Cappuccino - P,P,Beverage,5.00,95,cappuccino.png,"Um cappuccino pequeno delicioso!"
+2,Cappuccino - M,M,Beverage,7.00,99,cappuccino.png,"Um cappuccino médio delicioso!"
+3,Cappuccino - G,G,Beverage,11.00,90,cappuccino.png,"Um cappuccino grande delicioso!"

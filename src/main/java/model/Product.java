@@ -1,12 +1,14 @@
 package model;
 
 import exception.OutOfStockException;
+import model.enums.Category;
 import model.enums.Size;
 
-public class Product{
+public class Product {
     // Attributes
     private String name;
     private Size size;
+    private Category category;
     private double price;
     private int stockQtd;
     private String imagePath;
@@ -15,37 +17,35 @@ public class Product{
     private final int ID;
 
     // Constructor
-    public Product(int ID, String name, double price, int stockQtd, String imagePath, Size size, String description){
+    public Product(int ID, String name, double price, int stockQtd, String imagePath, Size size, Category category, String description) {
         this.name = name;
         this.price = price;
         this.stockQtd = stockQtd;
         this.imagePath = imagePath;
         this.size = size;
+        this.category = category;
         this.description = description;
         this.ID = ++idCounter;
     }
 
-
     // Methods
 
     // Stock management
-    public void decreaseStock(int qtd) throws OutOfStockException{
-
-        if(qtd > this.stockQtd){
+    public void decreaseStock(int qtd) throws OutOfStockException {
+        if (qtd > this.stockQtd) {
             throw new OutOfStockException("ERROR: No enough stock!"); // The code stops here if the exception occurs
         }
 
         setStockQtd((this.stockQtd - qtd));
     }
 
-    public void increaseStock(int qtd){
-        if(qtd > 0){
+    public void increaseStock(int qtd) {
+        if (qtd > 0) {
             this.stockQtd += qtd;
         } else {
             System.out.println("FAIL: You cannot add a value less than or equal to 0 to stock.");
         }
     }
-
 
     // Getters
     public int getStockQtd() {
@@ -63,6 +63,9 @@ public class Product{
     public Size getSize() {
         return size;
     }
+    public Category getCategory() { // Novo Getter
+        return category;
+    }
     public String getDescription() {
         return description;
     }
@@ -77,7 +80,6 @@ public class Product{
     public void setPrice(double price) {
         this.price = price;
     }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -86,6 +88,9 @@ public class Product{
     }
     public void setSize(Size size) {
         this.size = size;
+    }
+    public void setCategory(Category category) { // Novo Setter
+        this.category = category;
     }
     public void setDescription(String description) {
         this.description = description;

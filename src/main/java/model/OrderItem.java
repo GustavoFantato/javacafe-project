@@ -14,10 +14,7 @@ public class OrderItem{
         this.qtd = qtd;
     }
 
-
-
     // Methods
-
 
     // Getters
     public int getQtd() {
@@ -31,10 +28,10 @@ public class OrderItem{
     }
 
     // Setters
-    private void setProduct(Product product) {
+    public void setProduct(Product product) {
         this.product = product;
     }
-    private void setQtd(int qtd){
+    public void setQtd(int qtd){
         if (qtd > 0){
             this.qtd = qtd;
         } else {

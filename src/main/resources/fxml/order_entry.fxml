@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="700" prefWidth="1100" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.OrderEntryController">
+
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="16" styleClass="top-bar">
+            <padding><Insets bottom="12" left="20" right="20" top="12" /></padding>
+
+            <Label styleClass="app-title" text="☕  Java Café" />
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <Button onAction="#goToOrders" styleClass="nav-btn, nav-active" text="📋  Pedidos" />
+            <Button onAction="#goToInventory" styleClass="nav-btn" text="📦  Estoque" />
+            <Button onAction="#goToReports" styleClass="nav-btn" text="📊  Relatórios" />
+        </HBox>
+    </top>
+
+    <center>
+        <HBox spacing="0">
+
+            <VBox prefWidth="650" spacing="12" styleClass="panel-left">
+                <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
+
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Label styleClass="section-title" text="Cardápio" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <ToggleButton fx:id="catAll" onAction="#filterCategory" selected="true" styleClass="cat-btn" text="Todos" userData="ALL" />
+                    <ToggleButton fx:id="catDrinks" onAction="#filterCategory" styleClass="cat-btn" text="Bebidas" userData="DRINKS" />
+                    <ToggleButton fx:id="catFood" onAction="#filterCategory" styleClass="cat-btn" text="Comidas" userData="FOOD" />
+                    <ToggleButton fx:id="catDessert" onAction="#filterCategory" styleClass="cat-btn" text="Sobremesas" userData="DESSERTS" />
+                </HBox>
+
+                <TextField fx:id="searchField" onKeyReleased="#onSearch" promptText="🔍  Buscar por nome do produto..." styleClass="search-field" />
+
+                <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #fcf9f5; -fx-padding: 8; -fx-background-radius: 6;">
+
+                    <Label style="-fx-font-size: 12px;" styleClass="field-label" text="Tam:" />
+                    <ComboBox fx:id="filterSizeCombo" onAction="#onSearch" prefWidth="110" promptText="Qualquer" styleClass="payment-combo">
+                        <items>
+                            <FXCollections fx:factory="observableArrayList">
+                                <String fx:value="Todos" />
+                                <String fx:value="P" />
+                                <String fx:value="M" />
+                                <String fx:value="G" />
+                            </FXCollections>
+                        </items>
+                    </ComboBox>
+
+                    <Separator orientation="VERTICAL" />
+
+                    <Label style="-fx-font-size: 12px;" styleClass="field-label" text="Preço:" />
+                    <ComboBox fx:id="filterPriceOperatorCombo" onAction="#onSearch" prefWidth="130" promptText="Operador" styleClass="payment-combo">
+                        <items>
+                            <FXCollections fx:factory="observableArrayList">
+                                <String fx:value="Qualquer preço" />
+                                <String fx:value="Até (≤)" />
+                                <String fx:value="A partir de (≥)" />
+                                <String fx:value="Igual (=)" />
+                            </FXCollections>
+                        </items>
+                    </ComboBox>
+
+                    <TextField fx:id="filterPriceField" onKeyReleased="#onSearch" prefWidth="90" promptText="R$ 0,00" style="-fx-padding: 4 8 4 8;" styleClass="customer-field" />
+                </HBox>
+
+                <ScrollPane fitToWidth="true" styleClass="menu-scroll" VBox.vgrow="ALWAYS">
+                    <FlowPane fx:id="menuGrid" hgap="12" prefWrapLength="580" vgap="12">
+                        <padding><Insets bottom="4" left="4" right="4" top="4" /></padding>
+                    </FlowPane>
+                </ScrollPane>
+            </VBox>
+
+            <VBox prefWidth="450" spacing="0" styleClass="panel-right">
+
+                <HBox alignment="CENTER_LEFT" spacing="12" styleClass="order-header">
+                    <padding><Insets bottom="16" left="20" right="20" top="16" /></padding>
+                    <Label styleClass="order-header-title" text="🧾  Pedido Atual" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label fx:id="orderIdLabel" styleClass="order-id-badge" text="#001" />
+                    <Button onAction="#newOrder" styleClass="btn-ghost" text="Novo" />
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-background-color: #f9f5f0;">
+                    <padding><Insets bottom="10" left="20" right="20" top="10" /></padding>
+                    <Label styleClass="field-label" text="Cliente:" />
+                    <TextField fx:id="customerNameField" promptText="Nome (opcional)" styleClass="customer-field" HBox.hgrow="ALWAYS" />
+                </HBox>
+
+                <Separator />
+
+                <TableView fx:id="orderTable" styleClass="order-table" VBox.vgrow="ALWAYS">
+                    <placeholder>
+                        <Label text="Nenhum item adicionado" />
+                    </placeholder>
+                    <columns>
+                        <TableColumn fx:id="colItemName" prefWidth="180" style="-fx-alignment: CENTER_LEFT;" text="Item" />
+                        <TableColumn fx:id="colItemQty" prefWidth="60" style="-fx-alignment: CENTER;" text="Qtd" />
+                        <TableColumn fx:id="colItemPrice" prefWidth="80" style="-fx-alignment: CENTER_RIGHT;" text="Preço" />
+                        <TableColumn fx:id="colItemTotal" prefWidth="90" style="-fx-alignment: CENTER_RIGHT;" text="Total" />
+                        <TableColumn fx:id="colRemove" prefWidth="40" style="-fx-alignment: CENTER;" text="" />
+                    </columns>
+                </TableView>
+
+                <VBox spacing="6" styleClass="totals-box">
+                    <padding><Insets bottom="14" left="20" right="20" top="14" /></padding>
+                    <HBox>
+                        <Label styleClass="total-label" text="Subtotal" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="subtotalLabel" styleClass="total-value" text="R$ 0,00" />
+                    </HBox>
+                    <HBox>
+                        <Label styleClass="total-label" text="Impostos (10%)" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="taxLabel" styleClass="total-value" text="R$ 0,00" />
+                    </HBox>
+                    <Separator />
+                    <HBox>
+                        <Label styleClass="grand-total-label" text="TOTAL" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="grandTotalLabel" styleClass="grand-total-value" text="R$ 0,00" />
+                    </HBox>
+                </VBox>
+
+                <VBox spacing="10" styleClass="payment-box">
+                    <padding><Insets bottom="14" left="20" right="20" top="14" /></padding>
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label styleClass="field-label" text="Pagamento:" />
+                        <ComboBox fx:id="paymentCombo" promptText="Selecionar..." styleClass="payment-combo" HBox.hgrow="ALWAYS">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Dinheiro" />
+                                    <String fx:value="Cartão de Débito" />
+                                    <String fx:value="Cartão de Crédito" />
+                                    <String fx:value="PIX" />
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+                    </HBox>
+
+                    <HBox fx:id="cashRow" alignment="CENTER_LEFT" spacing="10">
+                        <Label styleClass="field-label" text="Valor recebido:" />
+                        <TextField fx:id="cashReceivedField" promptText="R$ 0,00" styleClass="cash-field" HBox.hgrow="ALWAYS" />
+                        <Label styleClass="field-label" text="Troco:" />
+                        <Label fx:id="changeLabel" styleClass="change-value" text="R$ 0,00" />
+                    </HBox>
+                </VBox>
+
+                <HBox spacing="10" styleClass="action-bar">
+                    <padding><Insets bottom="20" left="20" right="20" top="14" /></padding>
+                    <Button onAction="#clearOrder" prefWidth="120" styleClass="btn-secondary" text="🗑  Limpar" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button onAction="#finalizeOrder" prefHeight="44.0" prefWidth="184.0" styleClass="btn-primary" text="✅  Finalizar Venda" />
+                </HBox>
+
+            </VBox>
+        </HBox>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="status-bar">
+            <padding><Insets bottom="6" left="16" right="16" top="6" /></padding>
+            <Label fx:id="statusLabel" styleClass="status-text" text="Pronto" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="clockLabel" styleClass="status-clock" text="00:00" />
+            <Label fx:id="stockAlertLabel" styleClass="stock-alert" text="" />
+        </HBox>
+    </bottom>
+
+</BorderPane>

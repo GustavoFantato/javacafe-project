@@ -25,11 +25,11 @@ public class CheckoutService {
     // Methods
 
     // Process the payment method to its process
-    public boolean processPayment(PaymentMethods paymentMethod,Order currentOrder, double cashReceived)  throws InvalidPaymentException {
+    public boolean processPayment(PaymentMethods paymentMethod, Order currentOrder, double cashReceived) throws InvalidPaymentException {
 
-        double cartCost = currentOrder.getListCost();
+        double cartCost = currentOrder.getTotalCost(); // It considers the tax (-10%)
 
-        switch(paymentMethod){
+        switch (paymentMethod) {
             case CARD:
                 System.out.println("[Checkout] CARD SELECTED - Validation success");
                 return true;
@@ -40,8 +40,8 @@ public class CheckoutService {
 
             case CASH:
                 System.out.println("[Checkout] CASH SELECTED");
-                if(cashReceived < cartCost){
-                    throw new InvalidPaymentException("ERROR: No enough cash to finish the order");
+                if (cashReceived < cartCost) {
+                    throw new InvalidPaymentException("ERROR: Not enough cash to finish the order");
                 }
 
                 processChange(cartCost, cashReceived);
@@ -58,7 +58,7 @@ public class CheckoutService {
         java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy~HH:mm:ss");
         String timestamp = LocalDateTime.now().format(formatter);
 
-        double cartCost = currentOrder.getListCost();
+        double cartCost = currentOrder.getTotalCost();
         int orderId = currentOrder.getOrderID();
 
         double change = 0.0;
@@ -83,21 +83,20 @@ public class CheckoutService {
                             p.getID(),                  // productId
                             p.getName(),                // productName
                             item.getQtd(),              // quantity
-                            p.getPrice(),               // unitPrice --> The price may change on future, it is important logging the unitPrice
+                            p.getPrice(),               // unitPrice
                             item.getSubtotal()          // subtotal price
                     );
                     writer.write(line);
                     writer.newLine();
                 }
 
-                // Order's footer --> Focus logging the change, paymentMethod and totalPrice
                 String changeLine = String.format(java.util.Locale.US, "%c,%d,%s,%d,%s,%.2f,%.2f",
-                        'f',                     // footer identifier
+                        'f',                      // footer identifier
                         transactionId,                  // saleId
                         timestamp,                      // timestamp
                         orderId,                        // orderId
                         paymentMethod.name(),           // paymentMethod
-                        cartCost,                       // totalPrice global
+                        cartCost,                       // totalPrice with tax
                         change                          // change
                 );
                 writer.write(changeLine);
@@ -115,7 +114,7 @@ public class CheckoutService {
 
     // Prints, calculates and returns the change
     private void processChange(double cartCost, double cashReceived) {
-        System.out.printf("CART: R$%.2f\n", cartCost);
+        System.out.printf("CART TOTAL (WITH TAXES): R$%.2f\n", cartCost);
         System.out.printf("CASH RECEIVED: R$%.2f\n", cashReceived);
         System.out.printf("CHANGE: R$%.2f\n", calculateChange(cartCost, cashReceived));
     }
@@ -123,7 +122,6 @@ public class CheckoutService {
     private void loadLastTransactionId() {
         File file = new File(this.filePath);
         if (!file.exists() || file.length() == 0) {
-            // Archive not found
             return;
         }
 
@@ -131,7 +129,6 @@ public class CheckoutService {
             String line;
             String lastLine = null;
 
-            // Reads the archive until the end to get the last line, and then, the last transactionID
             while ((line = reader.readLine()) != null) {
                 if (!line.trim().isEmpty()) {
                     lastLine = line;
@@ -141,11 +138,9 @@ public class CheckoutService {
             if (lastLine != null) {
                 String[] tokens = lastLine.split(",");
 
-                // If the current line has the 'f', we are in the footer. The saleId is on the second column i = [1]
                 if (tokens[0].equals("f")) {
                     transactionId = Integer.parseInt(tokens[1]);
                 } else {
-                    // If there is an archive inconsistency, the last line may be a non-footer line, then the saleId is i = [0]
                     transactionId = Integer.parseInt(tokens[0]);
                 }
             }
@@ -154,8 +149,7 @@ public class CheckoutService {
         }
     }
 
-
-    private double calculateChange(double cartCost, double cashReceived){
+    private double calculateChange(double cartCost, double cashReceived) {
         return (cashReceived - cartCost);
     }
 }

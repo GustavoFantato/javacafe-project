@@ -4,17 +4,16 @@ import model.enums.Status;
 import java.util.ArrayList; // To use the order's item list
 import java.util.List;
 
-public class Order{
+public class Order {
 
     // Attributes
-
     private List<OrderItem> items; // Dynamic list
     private final int orderID;
-    private static int idCount = 0; //
+    private static int idCount = 0;
     private Status status;
 
     // Constructor
-    public Order(){
+    public Order() {
         this.orderID = ++idCount;
         this.items = new ArrayList<>(); // Creates order's item list
         this.status = Status.PENDING;
@@ -23,27 +22,39 @@ public class Order{
     // Methods
 
     // List manipulation
-    public void addItem(OrderItem item){ // Add a new item to the list
-        this.items.add(item);
+    public void addItem(OrderItem newItem) {
+        for (OrderItem existingItem : items) {
+            if (existingItem.getProduct().getID() == newItem.getProduct().getID()) {
+                existingItem.setQtd(existingItem.getQtd() + newItem.getQtd());
+                return;
+            }
+        }
+        this.items.add(newItem);
     }
 
-    public void removeItem(OrderItem item){ // Remove an item from the list
+    public void removeItem(OrderItem item) {
         this.items.remove(item);
     }
 
-    // Cost calculation
-    public double getListCost(){ // returns the list value
+    // Cost calculation (without tax)
+    public double getListCost() {
         double total = 0.0;
-
-        for (OrderItem item : items){
+        for (OrderItem item : items) {
             total += item.getSubtotal();
         }
-
         return total;
     }
 
-    // Getters
+    public double getTaxCost() {
+        return getListCost() * 0.10;
+    }
 
+    // Calculates total cost WITH the tax
+    public double getTotalCost() {
+        return getListCost() + getTaxCost();
+    }
+
+    // Getters
     public int getOrderID() {
         return orderID;
     }
@@ -59,9 +70,9 @@ public class Order{
         this.status = status;
     }
 
-
     @Override
     public String toString() {
-        return "Order #" + orderID + " [Status: " + status + "] - Total Items: " + items.size() + " - Total: R$ " + getListCost();
+        return String.format(java.util.Locale.US, "Order #%d [Status: %s] - Items: %d - Subtotal: R$ %.2f - Total: R$ %.2f",
+                orderID, status, items.size(), getListCost(), getTotalCost());
     }
 }

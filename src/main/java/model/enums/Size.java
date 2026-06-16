@@ -5,5 +5,5 @@ public enum Size {
     P,
     M,
     G,
-    ONESIZE;
+    ONESIZE
 }
