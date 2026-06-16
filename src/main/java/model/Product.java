@@ -71,10 +71,10 @@ public class Product{
     }
 
     // Setters
-    private void setStockQtd(int stockQtd) {
+    public void setStockQtd(int stockQtd) {
         this.stockQtd = stockQtd;
     }
-    private void setPrice(double price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 

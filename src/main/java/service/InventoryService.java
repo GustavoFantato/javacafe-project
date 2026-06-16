@@ -1,6 +1,7 @@
 package service;
 
-import model.enums.Size;
+import model.Enums.Size;
+import model.OrderItem;
 import model.Product;
 
 import java.io.*;
@@ -80,6 +81,13 @@ public class InventoryService{
             System.err.println("An error occurred while writing storage file: " + e.getMessage());
         }
     }
+
+
+
+
+
+
+
 
     // Getters
     public List<Product> getStorageList() {
