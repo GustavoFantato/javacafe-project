@@ -77,7 +77,7 @@ public class CheckoutService {
                 for (OrderItem item : currentOrder.getItems()) {
                     Product p = item.getProduct();
 
-                    String line = String.format(java.util.Locale.US, "%d,%d,%d,%s,%d,%.2f,%.2f,0.00",
+                    String line = String.format(java.util.Locale.US, "%d,%d,%d,%s,%d,%.2f,%.2f",
                             transactionId,              // saleId
                             orderId,                    // orderId
                             p.getID(),                  // productId

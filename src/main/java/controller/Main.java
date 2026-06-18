@@ -2,82 +2,116 @@ package controller;
 
 import exception.InvalidPaymentException;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
-import javafx.scene.layout.StackPane;
-import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import model.Order;
 import model.OrderItem;
 import model.Product;
+import model.enums.Category;
 import service.CheckoutService;
 import service.InventoryService;
 import service.enums.PaymentMethods;
 
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.util.Locale;
 
 import static model.enums.Size.*;
 
 public class Main extends Application {
 
-    @Override
-    public void start(Stage primaryStage) {
-        Label label = new Label("Java Café POS - Pronto para começar!");
-        StackPane root = new StackPane(label);
-        Scene scene = new Scene(root, 400, 300);
+    private static InventoryService inventoryService;
+    private static CheckoutService checkoutService;
+    private static Stage primaryStage;
+    private static final String STORAGE_PATH = "./data/storage.csv";
+    private static final String SALES_PATH = "./data/sales.csv";
 
-        primaryStage.setTitle("Java Café");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+    @Override
+    public void start(Stage stage) {
+        primaryStage = stage;
+        try {
+            // Garante a existência do diretório de dados
+            File dataDir = new File("./data");
+            if (!dataDir.exists()) {
+                dataDir.mkdirs();
+            }
+
+            // Abre a tela inicial padrão (Pedidos)
+            changeScene("/fxml/order_entry.fxml");
+
+            primaryStage.setTitle("Java Café POS");
+            primaryStage.setResizable(false);
+            primaryStage.show();
+
+        } catch (Exception e) {
+            System.err.println("CRITICAL: Falha ao carregar a interface gráfica do JavaFX.");
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Troca de cena injetando dinamicamente as dependências dos microsserviços
+     */
+    public static void changeScene(String fxmlPath) {
+        try {
+            FXMLLoader loader = new FXMLLoader(Main.class.getResource(fxmlPath));
+            BorderPane root = loader.load();
+
+            // Injeta as dependências necessárias no controller que acabou de ser inflado
+            Object controller = loader.getController();
+            if (controller instanceof OrderEntryController) {
+                ((OrderEntryController) controller).setServices(inventoryService, checkoutService);
+            } else if (controller instanceof InventoryController) {
+                ((InventoryController) controller).setService(inventoryService);
+            } else if (controller instanceof ReportsController) {
+                ((ReportsController) controller).setSalesFilePath(SALES_PATH);
+            }
+
+            // Se for a primeira inicialização
+            if (primaryStage.getScene() == null) {
+                Scene scene = new Scene(root, 1100, 700);
+                // Vincula o arquivo de estilo higienizado de forma segura
+                scene.getStylesheets().add(Main.class.getResource("/css/style.css").toExternalForm());
+                primaryStage.setScene(scene);
+            } else {
+                // Reaproveita a Scene alterando apenas o nó raiz (evita flickering e perda de foco)
+                primaryStage.getScene().setRoot(root);
+            }
+        } catch (IOException e) {
+            System.err.println("Erro crítico ao navegar para a tela: " + fxmlPath);
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
-        System.out.println("=== INICIANDO TESTE DO CHECKOUT SERVICE ===");
+        // Evita quebras de parseamento decimal no CSV (força ponto ao invés de vírgula)
+        Locale.setDefault(Locale.US);
 
-        // 1. Criamos um InventoryService de mentira (Mock) apenas para o teste passar
-        // Substitua pelo seu construtor real se ele pedir parâmetros!
-        InventoryService mockInventory = new InventoryService("./data/storage.csv") {
-            @Override
-            public void decreaseProductStock(int id, int qtd) {
-                System.out.println("[Mock Stock] Baixando " + qtd + " unidades do produto ID: " + id);
-            }
-        };
+        System.out.println("=== ☕ INICIANDO INFRAESTRUTURA DO JAVA CAFÉ ===");
 
-        // 2. Instanciamos o seu CheckoutService apontando para o arquivo de teste
-        String caminhoCsv = "./data/sales.csv";
-        CheckoutService checkoutService = new CheckoutService(mockInventory, caminhoCsv);
+        // Inicialização dos serviços globais
+        inventoryService = new InventoryService(STORAGE_PATH);
+        checkoutService = new CheckoutService(inventoryService, SALES_PATH);
 
-        // 3. Criamos alguns produtos fictícios para o teste
-        Product cafeP = new Product(1, "Cappuccino - M", 3.50, 20,"cappuccino.png", M, "Café P");
-        Product cafeM = new Product(1, "Cappuccino - P", 1.50, 20,"cappuccino.png", P, "Café G");
+        // Alimenta dados iniciais caso o estoque esteja completamente zerado
+        if (inventoryService.getStorageList().isEmpty()) {
+            System.out.println("[Menu] Estoque vazio detectado! Gerando itens iniciais de teste...");
 
-        // 4. Montamos o pedido (Order) usando a sua estrutura
-        Order primeiroPedido = new Order();
-        primeiroPedido.addItem(new OrderItem(cafeP, 2)); // 2 Cappuccinos P = R$ 10.00
-        primeiroPedido.addItem(new OrderItem(cafeM, 1)); // 1 Cappuccino M = R$ 7.00
-        // Total do pedido: R$ 17.00
+            Product cafeM = new Product(1, "Cappuccino Italiano", 8.50, 50, "cappuccino.png", M, Category.BEVERAGE, "Café espresso com leite vaporizado e canela.");
+            Product cafeP = new Product(2, "Espresso Simples", 4.50, 4, "espresso.png", P, Category.BEVERAGE, "Café espresso curto e encorpado (Estoque Baixo).");
+            Product bolo = new Product(3, "Bolo de Cenoura", 7.00, 15, "bolo.png", G, Category.FOOD, "Fatia de bolo artesanal com calda de chocolate.");
 
-        System.out.println("\n[Teste] Criado: " + primeiroPedido.toString());
-
-        // 5. Simulamos o fluxo de pagamento em DINHEIRO (CASH) recebendo R$ 20.00
-        try {
-            System.out.println("\n[Teste] Processando pagamento...");
-            boolean aprovado = checkoutService.processPayment(PaymentMethods.CASH, primeiroPedido, 20.00);
-
-            if (aprovado) {
-                System.out.println("[Teste] Sucesso! Finalizando a venda e gerando logs...");
-                checkoutService.finishSale(primeiroPedido, PaymentMethods.CASH, 20.00);
-            }
-
-        } catch (InvalidPaymentException e) {
-            System.err.println("[Teste] Erro esperado de pagamento: " + e.getMessage());
-        } catch (Exception e) {
-            System.err.println("[Teste] Erro inesperado: " + e.getMessage());
-            e.printStackTrace();
+            inventoryService.addProductStorage(cafeM);
+            inventoryService.addProductStorage(cafeP);
+            inventoryService.addProductStorage(bolo);
         }
 
-        System.out.println("\n=== FIM DO TESTE - ABRINDO INTERFACE JAVAFX ===");
+        // ⚠️ REMOVIDO: O bloco antigo de simulação de venda foi retirado daqui
+        // para impedir a gravação fantasma/duplicada no banco CSV ao iniciar o app.
 
-        // Inicializa o ciclo de vida do JavaFX
+        System.out.println("\n=== 🖥️ ABRINDO INTERFACE GRÁFICA JAVAFX ===");
         launch(args);
     }
 }
