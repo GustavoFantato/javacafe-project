@@ -1,18 +1,15 @@
 package controller;
 
-import exception.InvalidPaymentException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
-import model.Order;
-import model.OrderItem;
 import model.Product;
 import model.enums.Category;
 import service.CheckoutService;
 import service.InventoryService;
-import service.enums.PaymentMethods;
+import service.ReportsService;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +21,7 @@ public class Main extends Application {
 
     private static InventoryService inventoryService;
     private static CheckoutService checkoutService;
+    private static ReportsService reportsService;
     private static Stage primaryStage;
     private static final String STORAGE_PATH = "./data/storage.csv";
     private static final String SALES_PATH = "./data/sales.csv";
@@ -66,7 +64,7 @@ public class Main extends Application {
             } else if (controller instanceof InventoryController) {
                 ((InventoryController) controller).setService(inventoryService);
             } else if (controller instanceof ReportsController) {
-                ((ReportsController) controller).setSalesFilePath(SALES_PATH);
+                ((ReportsController) controller).setReportsService(reportsService);
             }
 
             // Se for a primeira inicialização
@@ -94,6 +92,7 @@ public class Main extends Application {
         // Inicialização dos serviços globais
         inventoryService = new InventoryService(STORAGE_PATH);
         checkoutService = new CheckoutService(inventoryService, SALES_PATH);
+        reportsService = new ReportsService(SALES_PATH);
 
         // Alimenta dados iniciais caso o estoque esteja completamente zerado
         if (inventoryService.getStorageList().isEmpty()) {

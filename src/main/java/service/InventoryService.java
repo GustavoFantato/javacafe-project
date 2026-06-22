@@ -11,22 +11,25 @@ import java.util.List;
 
 public class InventoryService {
 
-    // Attributes
+    private static final String CSV_HEADER =
+            "id,name,size,category,price,stock,lowStockThreshold,imagePath,description";
+
     private List<Product> storageList;
     private final String filePath;
 
-    // Constructor
     public InventoryService(String filePath) {
         this.filePath = filePath;
         this.storageList = new ArrayList<>();
         loadInventory();
     }
 
-    // Methods
-
-    // CSV Archive Manipulation Methods
     public void loadInventory() {
-        this.storageList.clear(); // clear the previous list
+        this.storageList.clear();
+
+        File file = new File(this.filePath);
+        if (!file.exists()) {
+            return;
+        }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(this.filePath))) {
             String line;
@@ -34,7 +37,7 @@ public class InventoryService {
 
             while ((line = reader.readLine()) != null) {
                 if (isHeader) {
-                    isHeader = false; // Ignores the CSV's first line (header)
+                    isHeader = false;
                     continue;
                 }
 
@@ -51,19 +54,18 @@ public class InventoryService {
 
     public void saveInventory() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.filePath))) {
-
-
-            writer.write("id,name,size,category,price,stock,imagePath,description");
+            writer.write(CSV_HEADER);
             writer.newLine();
 
             for (Product p : storageList) {
-                String line = String.format(java.util.Locale.US, "%d,%s,%s,%s,%.2f,%d,%s,\"%s\"",
+                String line = String.format(java.util.Locale.US, "%d,%s,%s,%s,%.2f,%d,%d,%s,\"%s\"",
                         p.getID(),
                         p.getName(),
                         p.getSize().name(),
                         p.getCategory().name(),
                         p.getPrice(),
                         p.getStockQtd(),
+                        p.getLowStockThreshold(),
                         p.getImagePath(),
                         p.getDescription()
                 );
@@ -78,7 +80,24 @@ public class InventoryService {
         }
     }
 
-    // Stock manipulation methods
+    public int getNextProductId() {
+        int maxId = 0;
+        for (Product p : storageList) {
+            maxId = Math.max(maxId, p.getID());
+        }
+        return maxId + 1;
+    }
+
+    public List<Product> getLowStockProducts() {
+        List<Product> lowStock = new ArrayList<>();
+        for (Product p : storageList) {
+            if (p.isLowStock()) {
+                lowStock.add(p);
+            }
+        }
+        return lowStock;
+    }
+
     public void decreaseProductStock(int id, int qtd) throws exception.OutOfStockException {
         Product p = findProductById(id);
 
@@ -86,7 +105,7 @@ public class InventoryService {
             p.decreaseStock(qtd);
             saveInventory();
         } else {
-            System.err.println("FAIL: Product with ID " + id + " not found!");
+            throw new exception.OutOfStockException("Produto com ID " + id + " não encontrado.");
         }
     }
 
@@ -157,7 +176,6 @@ public class InventoryService {
         return filtered;
     }
 
-    // Adding/Removing/Updating products in DataBase
     public void addProductStorage(Product newProd) {
         if (isWellFormatedProduct(newProd)) {
             storageList.add(newProd);
@@ -176,7 +194,7 @@ public class InventoryService {
             saveInventory();
             System.out.println("LOG: Product removed successfully!");
         } else {
-            System.out.println("FAIL: Product not found!");
+            System.err.println("FAIL: Product not found!");
         }
     }
 
@@ -189,7 +207,7 @@ public class InventoryService {
         Product oldProd = findProductById(updatedProd.getID());
 
         if (oldProd == null) {
-            System.err.println("FAIL: Cannot update. Product ID " + updatedProd.getID() + " not found. ID alteration is not allowed!");
+            System.err.println("FAIL: Cannot update. Product ID " + updatedProd.getID() + " not found.");
             return;
         }
 
@@ -198,6 +216,7 @@ public class InventoryService {
         oldProd.setCategory(updatedProd.getCategory());
         oldProd.setPrice(updatedProd.getPrice());
         oldProd.setStockQtd(updatedProd.getStockQtd());
+        oldProd.setLowStockThreshold(updatedProd.getLowStockThreshold());
         oldProd.setImagePath(updatedProd.getImagePath());
         oldProd.setDescription(updatedProd.getDescription());
 
@@ -205,26 +224,39 @@ public class InventoryService {
         System.out.println("LOG: Product ID " + updatedProd.getID() + " updated successfully!");
     }
 
-    // Getters
-    public List<Product> getStorageList() { return storageList; }
-    public String getFilePath() { return filePath; }
+    public List<Product> getStorageList() {
+        return storageList;
+    }
 
-    // Auxiliary method used in loadInventory()
+    public String getFilePath() {
+        return filePath;
+    }
+
     private Product parseLine(String line) {
         try {
             String[] tokens = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
-
-            int ID = Integer.parseInt(tokens[0].trim());
+            int id = Integer.parseInt(tokens[0].trim());
             String name = tokens[1].trim();
             Size size = Size.valueOf(tokens[2].trim().toUpperCase());
             Category category = Category.valueOf(tokens[3].trim().toUpperCase());
             double price = Double.parseDouble(tokens[4].trim());
             int stockQtd = Integer.parseInt(tokens[5].trim());
-            String imagePath = tokens[6].trim();
-            String description = tokens[7].trim().replace("\"", "");
 
-            return new Product(ID, name, price, stockQtd, imagePath, size, category, description);
+            int lowStockThreshold = Product.DEFAULT_LOW_STOCK_THRESHOLD;
+            String imagePath;
+            String description;
+
+            if (tokens.length >= 9) {
+                lowStockThreshold = Integer.parseInt(tokens[6].trim());
+                imagePath = tokens[7].trim();
+                description = tokens[8].trim().replace("\"", "");
+            } else {
+                imagePath = tokens[6].trim();
+                description = tokens[7].trim().replace("\"", "");
+            }
+
+            return new Product(id, name, price, stockQtd, imagePath, size, category, description, lowStockThreshold);
         } catch (Exception e) {
             System.err.println("Ignoring invalid line [storage.csv]: " + line + " -> Error: " + e.getMessage());
             return null;
@@ -267,6 +299,10 @@ public class InventoryService {
         }
         if (p.getStockQtd() < 0) {
             System.err.println("VALIDATION FAIL: Stock quantity cannot be negative.");
+            return false;
+        }
+        if (p.getLowStockThreshold() < 0) {
+            System.err.println("VALIDATION FAIL: Low stock threshold cannot be negative.");
             return false;
         }
         if (p.getImagePath() == null || p.getImagePath().trim().isEmpty()) {

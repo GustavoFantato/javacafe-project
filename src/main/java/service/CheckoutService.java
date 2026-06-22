@@ -41,7 +41,7 @@ public class CheckoutService {
             case CASH:
                 System.out.println("[Checkout] CASH SELECTED");
                 if (cashReceived < cartCost) {
-                    throw new InvalidPaymentException("ERROR: Not enough cash to finish the order");
+                    throw new InvalidPaymentException("Valor recebido insuficiente para finalizar o pedido.");
                 }
 
                 processChange(cartCost, cashReceived);
@@ -72,7 +72,15 @@ public class CheckoutService {
                 inventoryService.decreaseProductStock(p.getID(), item.getQtd());
             }
 
+            File salesFile = new File(this.filePath);
+            boolean writeHeader = !salesFile.exists() || salesFile.length() == 0;
+
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.filePath, true))) {
+
+                if (writeHeader) {
+                    writer.write("transactionId,orderId,productId,productName,qtd,unitPrice,subtotal");
+                    writer.newLine();
+                }
 
                 for (OrderItem item : currentOrder.getItems()) {
                     Product p = item.getProduct();
@@ -149,7 +157,7 @@ public class CheckoutService {
         }
     }
 
-    private double calculateChange(double cartCost, double cashReceived) {
+    public double calculateChange(double cartCost, double cashReceived) {
         return (cashReceived - cartCost);
     }
 }

@@ -7,10 +7,11 @@ import java.util.List;
 public class Order {
 
     // Attributes
-    private List<OrderItem> items; // Dynamic list
+    private List<OrderItem> items;
     private final int orderID;
     private static int idCount = 0;
     private Status status;
+    private String customerName;
 
     // Constructor
     public Order() {
@@ -65,9 +66,16 @@ public class Order {
         return items;
     }
 
-    // Setters
+    public String getCustomerName() {
+        return customerName;
+    }
+
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
     }
 
     @Override
