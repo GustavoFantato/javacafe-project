@@ -5,15 +5,23 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import model.Product;
 import model.enums.Category;
 import model.enums.Size;
 import service.InventoryService;
+import util.ProductImageResolver;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -49,9 +57,11 @@ public class InventoryController {
     @FXML private Label selectedProductLabel;
     @FXML private TextField editNameField;
     @FXML private TextField editPriceField;
+    @FXML private TextField editImageField;
     @FXML private Spinner<Integer> editThresholdSpinner;
     @FXML private Spinner<Integer> restockSpinner;
     @FXML private Label currentStockLabel;
+    @FXML private ImageView editImagePreview;
     @FXML private Label formStatusLabel;
     @FXML private Label statusLabel;
     @FXML private Label clockLabel;
@@ -106,6 +116,8 @@ public class InventoryController {
             }
         };
         inventoryTable.getSelectionModel().selectedItemProperty().addListener(selectionListener);
+
+        editImageField.textProperty().addListener((obs, oldValue, newValue) -> refreshImagePreview(newValue));
 
         javafx.animation.Timeline clock = new javafx.animation.Timeline(
                 new javafx.animation.KeyFrame(javafx.util.Duration.seconds(30), e -> updateClock()));
@@ -216,7 +228,7 @@ public class InventoryController {
             String description = newDescField.getText() != null ? newDescField.getText().trim() : "";
 
             Product product = new Product(
-                    newId, name.trim(), price, stock, "default.png",
+                    newId, name.trim(), price, stock, ProductImageResolver.defaultImagePath(),
                     Size.M, mapPtToCategoryEnum(categoryLabel), description, threshold);
 
             inventoryService.addProductStorage(product);
@@ -242,8 +254,10 @@ public class InventoryController {
         selectedProductLabel.setText(product.getName());
         editNameField.setText(product.getName());
         editPriceField.setText(String.format(Locale.US, "%.2f", product.getPrice()));
+        editImageField.setText(product.getImagePath());
         editThresholdSpinner.getValueFactory().setValue(product.getLowStockThreshold());
         currentStockLabel.setText(String.valueOf(product.getStockQtd()));
+        refreshImagePreview(product.getImagePath());
     }
 
     @FXML
@@ -262,7 +276,7 @@ public class InventoryController {
                     editNameField.getText().trim(),
                     price,
                     selectedProduct.getStockQtd(),
-                    selectedProduct.getImagePath(),
+                    getEditedImagePath(),
                     selectedProduct.getSize(),
                     selectedProduct.getCategory(),
                     selectedProduct.getDescription(),
@@ -332,17 +346,44 @@ public class InventoryController {
 
     @FXML
     private void exportCSV() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("backup_estoque.csv"))) {
-            writer.write("ID,Produto,Categoria,Preco,Estoque,Limite\n");
-            for (Product p : inventoryService.getStorageList()) {
-                writer.write(String.format(Locale.US, "%d,%s,%s,%.2f,%d,%d\n",
-                        p.getID(), p.getName(), translateCategoryToPt(p.getCategory()),
-                        p.getPrice(), p.getStockQtd(), p.getLowStockThreshold()));
-            }
-            formStatusLabel.setText("Estoque exportado para 'backup_estoque.csv'!");
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Salvar backup do estoque");
+        chooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Arquivo CSV", "*.csv"));
+        chooser.setInitialFileName("backup_estoque_" +
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmm")) + ".csv");
+
+        Stage stage = (Stage) inventoryTable.getScene().getWindow();
+        File targetFile = chooser.showSaveDialog(stage);
+        if (targetFile == null) {
+            formStatusLabel.setText("Exportacao cancelada.");
+            return;
+        }
+
+        try {
+            Files.copy(new File(inventoryService.getFilePath()).toPath(),
+                    targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            formStatusLabel.setText("Backup salvo em: " + targetFile.getAbsolutePath());
         } catch (Exception e) {
             formStatusLabel.setText("Erro ao exportar CSV.");
         }
+    }
+
+    @FXML
+    private void browseEditImage() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Selecionar imagem do produto");
+        chooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Imagens", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp"));
+
+        Stage stage = (Stage) inventoryTable.getScene().getWindow();
+        File selectedFile = chooser.showOpenDialog(stage);
+        if (selectedFile == null) {
+            return;
+        }
+
+        editImageField.setText(selectedFile.toURI().toString());
+        formStatusLabel.setText("Imagem selecionada para o produto.");
     }
 
     private Category mapPtToCategoryEnum(String label) {
@@ -365,6 +406,18 @@ public class InventoryController {
 
     private void updateClock() {
         clockLabel.setText(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
+    }
+
+    private String getEditedImagePath() {
+        String imagePath = editImageField.getText();
+        if (imagePath == null || imagePath.isBlank()) {
+            return ProductImageResolver.defaultImagePath();
+        }
+        return imagePath.trim();
+    }
+
+    private void refreshImagePreview(String imagePath) {
+        editImagePreview.setImage(ProductImageResolver.load(imagePath, 220, 140));
     }
 
     @FXML

@@ -293,3 +293,273 @@
 }
 .status-text { -fx-text-fill: #757575; -fx-size: 12px; }
 .status-clock { -fx-text-fill: #3E2723; -fx-size: 12px; -fx-font-weight: bold; }
+
+/* ═════════════════════════════════════════════════════════════════════
+   🍽️ MENU CARDS & PAGINATION
+   ═════════════════════════════════════════════════════════════════════ */
+.menu-card {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E8E0D8;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 3);
+}
+
+.menu-item-image {
+    -fx-fit-width: 204;
+    -fx-fit-height: 114;
+    -fx-preserve-ratio: true;
+    -fx-smooth: true;
+}
+
+.menu-item-name {
+    -fx-text-fill: #3E2723;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.menu-item-description {
+    -fx-text-fill: #6D6D6D;
+    -fx-font-size: 12px;
+}
+
+.menu-item-price {
+    -fx-text-fill: #2E7D32;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.menu-item-stock {
+    -fx-text-fill: #757575;
+    -fx-font-size: 12px;
+}
+
+.menu-item-stock-low {
+    -fx-text-fill: #C62828;
+    -fx-font-weight: bold;
+}
+
+.btn-primary-small {
+    -fx-background-color: #2E7D32;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-padding: 8 14 8 14;
+    -fx-cursor: hand;
+}
+
+.btn-primary-small:hover {
+    -fx-background-color: #1B5E20;
+}
+
+.btn-ghost-small {
+    -fx-background-color: transparent;
+    -fx-text-fill: #8D6E63;
+    -fx-border-color: #8D6E63;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 6 12 6 12;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.btn-ghost-small:hover {
+    -fx-background-color: rgba(141, 110, 99, 0.1);
+}
+
+.menu-empty-state {
+    -fx-padding: 30;
+}
+
+.pagination {
+    -fx-page-information-visible: false;
+}
+
+.pagination .page {
+    -fx-background-color: transparent;
+}
+
+.pagination .pagination-control {
+    -fx-padding: 10 0 0 0;
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   📈 REPORT TOGGLES & LINE CHART
+   ═════════════════════════════════════════════════════════════════════ */
+.chart-toggle-btn {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D7CCC8;
+    -fx-border-radius: 18;
+    -fx-background-radius: 18;
+    -fx-text-fill: #5D4037;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 6 12 6 12;
+}
+
+.chart-toggle-btn:selected {
+    -fx-background-color: #8D6E63;
+    -fx-border-color: #8D6E63;
+    -fx-text-fill: #FFFFFF;
+}
+
+.default-color0.chart-series-line {
+    -fx-stroke: #8D6E63;
+    -fx-stroke-width: 3px;
+}
+
+.default-color0.chart-line-symbol {
+    -fx-background-color: #8D6E63, white;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 6px;
+    -fx-padding: 5px;
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   📊 REPORTS PAGE
+   ═════════════════════════════════════════════════════════════════════ */
+.report-controls {
+    -fx-background-color: #FFFFFF;
+}
+
+.field-label {
+    -fx-text-fill: #757575;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.period-btn {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D7CCC8;
+    -fx-border-radius: 18;
+    -fx-background-radius: 18;
+    -fx-text-fill: #5D4037;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 6 16 6 16;
+}
+
+.period-btn:hover {
+    -fx-background-color: #F5F5F5;
+}
+
+.period-btn:selected,
+.period-active {
+    -fx-background-color: #8D6E63;
+    -fx-border-color: #8D6E63;
+    -fx-text-fill: #FFFFFF;
+}
+
+.report-range-label {
+    -fx-text-fill: #757575;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.kpi-sub {
+    -fx-text-fill: #757575;
+    -fx-font-size: 12px;
+}
+
+.kpi-delta-neutral {
+    -fx-text-fill: #757575;
+    -fx-font-size: 12px;
+}
+
+.chart-title-sm {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #3E2723;
+}
+
+.report-chart {
+    -fx-padding: 8 0 0 0;
+    -fx-background-color: transparent;
+}
+
+.report-chart .chart-plot-background {
+    -fx-background-color: #FAFAFA;
+    -fx-border-color: #EFEBE9;
+    -fx-border-width: 1;
+}
+
+.report-chart .axis {
+    -fx-tick-label-fill: #757575;
+    -fx-font-size: 11px;
+}
+
+.report-chart .axis-label {
+    -fx-text-fill: #757575;
+}
+
+.report-chart .chart-bar {
+    -fx-bar-fill: #8D6E63;
+}
+
+.report-chart .default-color0.chart-bar {
+    -fx-bar-fill: #8D6E63;
+}
+
+.top-item-row {
+    -fx-padding: 4 0 4 0;
+}
+
+.medal {
+    -fx-font-size: 18px;
+    -fx-min-width: 28;
+}
+
+.top-item-name {
+    -fx-text-fill: #3E2723;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.top-item-sub {
+    -fx-text-fill: #757575;
+    -fx-font-size: 11px;
+}
+
+.top-bar-fill {
+    -fx-background-color: #8D6E63;
+    -fx-background-radius: 3;
+    -fx-min-height: 8;
+    -fx-max-height: 8;
+    -fx-pref-height: 8;
+}
+
+.payment-pie {
+    -fx-padding: 0;
+}
+
+.payment-pie .chart-pie {
+    -fx-border-color: transparent;
+}
+
+.payment-pie .chart-pie-label-line {
+    -fx-stroke: transparent;
+}
+
+.payment-pie .chart-legend {
+    -fx-background-color: transparent;
+    -fx-padding: 8 0 0 0;
+}
+
+.payment-pie .chart-legend-item {
+    -fx-text-fill: #3E2723;
+    -fx-font-size: 12px;
+}
+
+.payment-pie .default-color0.chart-pie { -fx-pie-color: #8D6E63; }
+.payment-pie .default-color1.chart-pie { -fx-pie-color: #2E7D32; }
+.payment-pie .default-color2.chart-pie { -fx-pie-color: #5D4037; }
+
+.date-picker {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D7CCC8;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}

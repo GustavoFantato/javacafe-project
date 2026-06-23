@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.image.ImageView?>
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
@@ -11,7 +12,7 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="controller.InventoryController"
             stylesheets="@../css/style.css"
-            prefWidth="1100" prefHeight="700">
+            prefWidth="1280" prefHeight="820">
 
     <top>
         <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="16">
@@ -29,7 +30,7 @@
     <center>
         <HBox spacing="0">
 
-            <VBox styleClass="panel-left" prefWidth="680" spacing="16">
+            <VBox styleClass="panel-left" prefWidth="760" spacing="16">
                 <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
 
                 <HBox spacing="10" alignment="CENTER_LEFT">
@@ -94,7 +95,7 @@
                 </HBox>
             </VBox>
 
-            <VBox styleClass="panel-right" prefWidth="420" spacing="0">
+            <VBox styleClass="panel-right" prefWidth="520" spacing="0">
 
                 <HBox styleClass="form-header" alignment="CENTER_LEFT" spacing="0">
                     <ToggleButton fx:id="tabAddProduct"
@@ -191,6 +192,24 @@
                         <Separator/>
 
                         <Label text="Atualizar Informações" styleClass="form-section-title"/>
+
+                        <VBox spacing="8">
+                            <Label text="Imagem do Produto" styleClass="field-label"/>
+                            <ImageView fx:id="editImagePreview"
+                                       fitWidth="220"
+                                       fitHeight="140"
+                                       pickOnBounds="true"
+                                       preserveRatio="true"/>
+                            <HBox spacing="8">
+                                <TextField fx:id="editImageField"
+                                           promptText="Ex: images/products/cookie.jpg"
+                                           styleClass="form-field"
+                                           HBox.hgrow="ALWAYS"/>
+                                <Button text="Escolher..."
+                                        styleClass="btn-ghost-small"
+                                        onAction="#browseEditImage"/>
+                            </HBox>
+                        </VBox>
 
                         <VBox spacing="4">
                             <Label text="Nome" styleClass="field-label"/>

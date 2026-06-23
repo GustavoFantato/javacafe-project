@@ -9,9 +9,12 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import model.Order;
@@ -24,6 +27,7 @@ import service.InventoryService;
 import service.ReceiptService;
 import service.enums.FilterOperator;
 import service.enums.PaymentMethods;
+import util.ProductImageResolver;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -41,7 +45,7 @@ public class OrderEntryController {
     @FXML private ComboBox<String> filterSizeCombo;
     @FXML private ComboBox<String> filterPriceOperatorCombo;
     @FXML private TextField filterPriceField;
-    @FXML private FlowPane menuGrid;
+    @FXML private Pagination menuPagination;
     @FXML private Label orderIdLabel;
     @FXML private TextField customerNameField;
     @FXML private TableView<OrderItem> orderTable;
@@ -68,8 +72,14 @@ public class OrderEntryController {
     private Order currentOrder;
     private ObservableList<OrderItem> orderItemsObservableList;
     private Category currentCategoryFilter;
+    private List<Product> filteredProducts = new ArrayList<>();
 
     private final ToggleGroup categoryToggleGroup = new ToggleGroup();
+    private static final int ITEMS_PER_PAGE = 6;
+    private static final double MENU_GRID_WRAP_LENGTH = 720;
+    private static final double MENU_CARD_WIDTH = 228;
+    private static final double MENU_IMAGE_WIDTH = 204;
+    private static final double MENU_IMAGE_HEIGHT = 114;
 
     @FXML
     public void initialize() {
@@ -178,36 +188,11 @@ public class OrderEntryController {
     }
 
     private void renderMenuCards(List<Product> products) {
-        menuGrid.getChildren().clear();
-
-        for (Product product : products) {
-            VBox card = new VBox(6);
-            card.getStyleClass().add("menu-card");
-            card.setPadding(new Insets(12));
-            card.setPrefWidth(170);
-
-            Label nameLabel = new Label(product.getName());
-            nameLabel.getStyleClass().add("menu-item-name");
-            nameLabel.setWrapText(true);
-
-            Label priceLabel = new Label(String.format(Locale.forLanguageTag("pt-BR"), "R$ %.2f", product.getPrice()));
-            priceLabel.getStyleClass().add("menu-item-price");
-
-            Label stockLabel = new Label("Estoque: " + product.getStockQtd());
-            stockLabel.getStyleClass().add("menu-item-stock");
-            if (product.isLowStock()) {
-                stockLabel.setStyle("-fx-text-fill: #C62828; -fx-font-weight: bold;");
-            }
-
-            Button addBtn = new Button("+ Adicionar");
-            addBtn.getStyleClass().add("btn-primary-small");
-            addBtn.setMaxWidth(Double.MAX_VALUE);
-            addBtn.setDisable(product.getStockQtd() <= 0);
-            addBtn.setOnAction(e -> addProductToOrder(product));
-
-            card.getChildren().addAll(nameLabel, priceLabel, stockLabel, addBtn);
-            menuGrid.getChildren().add(card);
-        }
+        filteredProducts = new ArrayList<>(products);
+        int pageCount = Math.max(1, (int) Math.ceil(filteredProducts.size() / (double) ITEMS_PER_PAGE));
+        menuPagination.setPageCount(pageCount);
+        menuPagination.setCurrentPageIndex(0);
+        menuPagination.setPageFactory(this::createMenuPage);
     }
 
     private void addProductToOrder(Product product) {
@@ -381,6 +366,69 @@ public class OrderEntryController {
 
     private void updateClock() {
         clockLabel.setText(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
+    }
+
+    private Node createMenuPage(Integer pageIndex) {
+        FlowPane pageGrid = new FlowPane(12, 12);
+        pageGrid.setPadding(new Insets(4));
+        pageGrid.setPrefWrapLength(MENU_GRID_WRAP_LENGTH);
+
+        int start = pageIndex * ITEMS_PER_PAGE;
+        int end = Math.min(start + ITEMS_PER_PAGE, filteredProducts.size());
+
+        if (filteredProducts.isEmpty()) {
+            StackPane emptyPane = new StackPane(new Label("Nenhum produto encontrado."));
+            emptyPane.getStyleClass().add("menu-empty-state");
+            return emptyPane;
+        }
+
+        for (int i = start; i < end; i++) {
+            pageGrid.getChildren().add(buildMenuCard(filteredProducts.get(i)));
+        }
+
+        return pageGrid;
+    }
+
+    private VBox buildMenuCard(Product product) {
+        VBox card = new VBox(8);
+        card.getStyleClass().add("menu-card");
+        card.setPadding(new Insets(12));
+        card.setPrefWidth(MENU_CARD_WIDTH);
+
+        ImageView imageView = new ImageView(ProductImageResolver.load(product.getImagePath(),
+                MENU_IMAGE_WIDTH, MENU_IMAGE_HEIGHT));
+        imageView.setFitWidth(MENU_IMAGE_WIDTH);
+        imageView.setFitHeight(MENU_IMAGE_HEIGHT);
+        imageView.setPreserveRatio(true);
+        imageView.setSmooth(true);
+        imageView.setCache(true);
+        imageView.getStyleClass().add("menu-item-image");
+
+        Label nameLabel = new Label(product.getName());
+        nameLabel.getStyleClass().add("menu-item-name");
+        nameLabel.setWrapText(true);
+
+        Label descriptionLabel = new Label(product.getDescription());
+        descriptionLabel.getStyleClass().add("menu-item-description");
+        descriptionLabel.setWrapText(true);
+
+        Label priceLabel = new Label(String.format(Locale.forLanguageTag("pt-BR"), "R$ %.2f", product.getPrice()));
+        priceLabel.getStyleClass().add("menu-item-price");
+
+        Label stockLabel = new Label("Estoque: " + product.getStockQtd());
+        stockLabel.getStyleClass().add("menu-item-stock");
+        if (product.isLowStock()) {
+            stockLabel.getStyleClass().add("menu-item-stock-low");
+        }
+
+        Button addBtn = new Button("+ Adicionar");
+        addBtn.getStyleClass().add("btn-primary-small");
+        addBtn.setMaxWidth(Double.MAX_VALUE);
+        addBtn.setDisable(product.getStockQtd() <= 0);
+        addBtn.setOnAction(e -> addProductToOrder(product));
+
+        card.getChildren().addAll(imageView, nameLabel, descriptionLabel, priceLabel, stockLabel, addBtn);
+        return card;
     }
 
     private PaymentMethods mapPaymentMethod(String label) {

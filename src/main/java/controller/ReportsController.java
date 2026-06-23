@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
@@ -38,6 +39,7 @@ public class ReportsController {
     @FXML private Label kpiBestItem;
     @FXML private Label kpiBestQty;
     @FXML private BarChart<String, Number> revenueChart;
+    @FXML private LineChart<String, Number> revenueLineChart;
     @FXML private CategoryAxis revenueXAxis;
     @FXML private NumberAxis revenueYAxis;
     @FXML private Label top1Name;
@@ -48,12 +50,16 @@ public class ReportsController {
     @FXML private Label top3Detail;
     @FXML private PieChart paymentPieChart;
     @FXML private Label lastUpdatedLabel;
+    @FXML private ToggleButton chartBarsToggle;
+    @FXML private ToggleButton chartLinesToggle;
 
     private ReportsService reportsService;
     private LocalDate currentStart;
     private LocalDate currentEnd;
+    private ReportsService.RevenueGrouping currentGrouping = ReportsService.RevenueGrouping.DAILY;
 
     private final ToggleGroup periodGroup = new ToggleGroup();
+    private final ToggleGroup chartTypeGroup = new ToggleGroup();
     private final DateTimeFormatter displayDateFmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @FXML
@@ -62,9 +68,21 @@ public class ReportsController {
         btnWeek.setToggleGroup(periodGroup);
         btnMonth.setToggleGroup(periodGroup);
         periodGroup.selectToggle(btnToday);
+        chartBarsToggle.setToggleGroup(chartTypeGroup);
+        chartLinesToggle.setToggleGroup(chartTypeGroup);
+        chartTypeGroup.selectToggle(chartBarsToggle);
 
         revenueChart.setLegendVisible(false);
-        paymentPieChart.setLabelsVisible(true);
+        revenueLineChart.setLegendVisible(false);
+        revenueChart.setCategoryGap(12);
+        revenueChart.setBarGap(3);
+        revenueYAxis.setForceZeroInRange(true);
+        revenueYAxis.setMinorTickVisible(false);
+
+        paymentPieChart.setLabelsVisible(false);
+        paymentPieChart.setLegendVisible(true);
+        paymentPieChart.setStartAngle(90);
+        setChartType(false);
     }
 
     public void setReportsService(ReportsService reportsService) {
@@ -91,6 +109,7 @@ public class ReportsController {
         selectPeriod(btnToday);
         currentStart = LocalDate.now();
         currentEnd = LocalDate.now();
+        currentGrouping = ReportsService.RevenueGrouping.HOURLY;
         reportRangeLabel.setText("Hoje — " + currentStart.format(displayDateFmt));
         processSalesData(currentStart, currentEnd);
     }
@@ -99,7 +118,8 @@ public class ReportsController {
     private void loadWeek() {
         selectPeriod(btnWeek);
         currentStart = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        currentEnd = LocalDate.now();
+        currentEnd = currentStart.plusDays(6);
+        currentGrouping = ReportsService.RevenueGrouping.WEEKLY;
         reportRangeLabel.setText(String.format("%s — %s",
                 currentStart.format(displayDateFmt), currentEnd.format(displayDateFmt)));
         processSalesData(currentStart, currentEnd);
@@ -110,6 +130,7 @@ public class ReportsController {
         selectPeriod(btnMonth);
         currentStart = LocalDate.now().withDayOfMonth(1);
         currentEnd = LocalDate.now();
+        currentGrouping = ReportsService.RevenueGrouping.DAILY;
         reportRangeLabel.setText(String.format("%s — %s",
                 currentStart.format(displayDateFmt), currentEnd.format(displayDateFmt)));
         processSalesData(currentStart, currentEnd);
@@ -134,6 +155,7 @@ public class ReportsController {
         periodGroup.selectToggle(null);
         currentStart = start;
         currentEnd = end;
+        currentGrouping = ReportsService.RevenueGrouping.DAILY;
         reportRangeLabel.setText(String.format("%s — %s",
                 start.format(displayDateFmt), end.format(displayDateFmt)));
         processSalesData(start, end);
@@ -152,7 +174,7 @@ public class ReportsController {
             return;
         }
 
-        SalesReport report = reportsService.generateReport(start, end);
+        SalesReport report = reportsService.generateReport(start, end, currentGrouping);
         updateKPIUi(report);
         updateChartsUi(report);
         lastUpdatedLabel.setText("Atualizado: " +
@@ -199,11 +221,13 @@ public class ReportsController {
 
     private void updateChartsUi(SalesReport report) {
         revenueChart.getData().clear();
+        revenueLineChart.getData().clear();
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        for (Map.Entry<String, Double> entry : report.getDailyRevenue().entrySet()) {
+        for (Map.Entry<String, Double> entry : report.getRevenueSeries().entrySet()) {
             series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
         }
         revenueChart.getData().add(series);
+        revenueLineChart.getData().add(copySeries(series));
 
         paymentPieChart.setData(FXCollections.observableArrayList());
         for (Map.Entry<String, Integer> entry : report.getPaymentBreakdown().entrySet()) {
@@ -220,7 +244,18 @@ public class ReportsController {
         kpiBestQty.setText("0 unidades");
         clearTop3();
         revenueChart.getData().clear();
+        revenueLineChart.getData().clear();
         paymentPieChart.setData(FXCollections.observableArrayList());
+    }
+
+    @FXML
+    private void showBarChart() {
+        setChartType(false);
+    }
+
+    @FXML
+    private void showLineChart() {
+        setChartType(true);
     }
 
     private void clearTop3() {
@@ -237,6 +272,21 @@ public class ReportsController {
         } catch (IllegalArgumentException e) {
             return method;
         }
+    }
+
+    private void setChartType(boolean lineChartVisible) {
+        revenueChart.setVisible(!lineChartVisible);
+        revenueChart.setManaged(!lineChartVisible);
+        revenueLineChart.setVisible(lineChartVisible);
+        revenueLineChart.setManaged(lineChartVisible);
+    }
+
+    private XYChart.Series<String, Number> copySeries(XYChart.Series<String, Number> original) {
+        XYChart.Series<String, Number> copy = new XYChart.Series<>();
+        for (XYChart.Data<String, Number> data : original.getData()) {
+            copy.getData().add(new XYChart.Data<>(data.getXValue(), data.getYValue()));
+        }
+        return copy;
     }
 
     @FXML

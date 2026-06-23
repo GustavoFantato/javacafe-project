@@ -7,6 +7,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.TextStyle;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -20,6 +23,14 @@ public class ReportsService {
 
     private static final DateTimeFormatter FOOTER_DATE =
             DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    private static final DateTimeFormatter FOOTER_TIMESTAMP =
+            DateTimeFormatter.ofPattern("dd-MM-yyyy~HH:mm:ss");
+
+    public enum RevenueGrouping {
+        HOURLY,
+        DAILY,
+        WEEKLY
+    }
 
     private final String filePath;
 
@@ -27,7 +38,7 @@ public class ReportsService {
         this.filePath = filePath;
     }
 
-    public SalesReport generateReport(LocalDate start, LocalDate end) {
+    public SalesReport generateReport(LocalDate start, LocalDate end, RevenueGrouping grouping) {
         SalesReport report = new SalesReport();
         report.setTop3(new TopItem[3]);
 
@@ -42,7 +53,7 @@ public class ReportsService {
         Map<String, Integer> itemQuantities = new HashMap<>();
         Map<String, Double> itemRevenues = new HashMap<>();
         Map<String, Integer> paymentBreakdown = new HashMap<>();
-        Map<String, Double> dailyRevenue = new HashMap<>();
+        Map<String, Double> revenueSeries = new HashMap<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
@@ -59,8 +70,14 @@ public class ReportsService {
                     }
 
                     int transactionId = Integer.parseInt(tokens[1]);
-                    LocalDate saleDate = parseFooterDate(tokens[2]);
-                    if (saleDate == null || saleDate.isBefore(start) || saleDate.isAfter(end)) {
+                    LocalDateTime saleTimestamp = parseFooterTimestamp(tokens[2]);
+                    if (saleTimestamp == null) {
+                        transactionItems.remove(transactionId);
+                        continue;
+                    }
+
+                    LocalDate saleDate = saleTimestamp.toLocalDate();
+                    if (saleDate.isBefore(start) || saleDate.isAfter(end)) {
                         transactionItems.remove(transactionId);
                         continue;
                     }
@@ -69,8 +86,8 @@ public class ReportsService {
                     double cartCost = Double.parseDouble(tokens[5]);
                     totalRevenue += cartCost;
 
-                    String dayKey = saleDate.format(DateTimeFormatter.ofPattern("dd/MM"));
-                    dailyRevenue.merge(dayKey, cartCost, Double::sum);
+                    String periodKey = formatRevenueKey(saleTimestamp, grouping);
+                    revenueSeries.merge(periodKey, cartCost, Double::sum);
 
                     String payment = tokens[4];
                     paymentBreakdown.merge(payment, 1, Integer::sum);
@@ -97,7 +114,7 @@ public class ReportsService {
         report.setTotalRevenue(totalRevenue);
         report.setTransactionCount(transactionCount);
         report.setPaymentBreakdown(paymentBreakdown);
-        report.setDailyRevenue(fillDailyRevenueRange(dailyRevenue, start, end));
+        report.setRevenueSeries(fillRevenueSeriesRange(revenueSeries, start, end, grouping));
         report.setTop3(buildTop3(itemQuantities, itemRevenues));
 
         return report;
@@ -117,25 +134,65 @@ public class ReportsService {
         return top3;
     }
 
-    private Map<String, Double> fillDailyRevenueRange(Map<String, Double> dailyRevenue,
-                                                      LocalDate start, LocalDate end) {
+    private Map<String, Double> fillRevenueSeriesRange(Map<String, Double> revenueSeries,
+                                                       LocalDate start, LocalDate end,
+                                                       RevenueGrouping grouping) {
         Map<String, Double> filled = new LinkedHashMap<>();
-        LocalDate cursor = start;
-        DateTimeFormatter keyFmt = DateTimeFormatter.ofPattern("dd/MM");
+        if (grouping == RevenueGrouping.HOURLY) {
+            int minHour = 8;
+            int maxHour = 20;
+            if (!revenueSeries.isEmpty()) {
+                minHour = revenueSeries.keySet().stream()
+                        .mapToInt(k -> Integer.parseInt(k.replace("h", "")))
+                        .min().orElse(8);
+                maxHour = revenueSeries.keySet().stream()
+                        .mapToInt(k -> Integer.parseInt(k.replace("h", "")))
+                        .max().orElse(20);
+                minHour = Math.max(0, minHour - 1);
+                maxHour = Math.min(23, maxHour + 1);
+            }
+            for (int hour = minHour; hour <= maxHour; hour++) {
+                String key = String.format("%02dh", hour);
+                filled.put(key, revenueSeries.getOrDefault(key, 0.0));
+            }
+            return filled;
+        }
 
+        LocalDate cursor = start;
         while (!cursor.isAfter(end)) {
-            String key = cursor.format(keyFmt);
-            filled.put(key, dailyRevenue.getOrDefault(key, 0.0));
+            String key = grouping == RevenueGrouping.WEEKLY
+                    ? formatWeekdayKey(cursor)
+                    : cursor.format(DateTimeFormatter.ofPattern("dd/MM"));
+            filled.put(key, revenueSeries.getOrDefault(key, 0.0));
             cursor = cursor.plusDays(1);
         }
 
         return filled;
     }
 
-    private LocalDate parseFooterDate(String timestampField) {
+    private String formatRevenueKey(LocalDateTime timestamp, RevenueGrouping grouping) {
+        return switch (grouping) {
+            case HOURLY -> String.format("%02dh", timestamp.getHour());
+            case WEEKLY -> formatWeekdayKey(timestamp.toLocalDate());
+            case DAILY -> timestamp.toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM"));
+        };
+    }
+
+    private String formatWeekdayKey(LocalDate date) {
+        return switch (date.getDayOfWeek()) {
+            case MONDAY -> "Seg";
+            case TUESDAY -> "Ter";
+            case WEDNESDAY -> "Qua";
+            case THURSDAY -> "Qui";
+            case FRIDAY -> "Sex";
+            case SATURDAY -> "Sab";
+            case SUNDAY -> "Dom";
+        };
+    }
+
+    private LocalDateTime parseFooterTimestamp(String timestampField) {
         try {
-            String datePart = timestampField.split("~")[0];
-            return LocalDate.parse(datePart, FOOTER_DATE);
+            return LocalDateTime.parse(timestampField, FOOTER_TIMESTAMP);
         } catch (Exception e) {
             return null;
         }

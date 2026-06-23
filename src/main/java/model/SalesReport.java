@@ -8,12 +8,12 @@ public class SalesReport {
     private int transactionCount;
     private TopItem[] top3;
     private java.util.Map<String, Integer> paymentBreakdown;
-    private java.util.Map<String, Double> dailyRevenue;
+    private java.util.Map<String, Double> revenueSeries;
 
     public SalesReport() {
         this.top3 = new TopItem[3];
         this.paymentBreakdown = new java.util.HashMap<>();
-        this.dailyRevenue = new java.util.LinkedHashMap<>();
+        this.revenueSeries = new java.util.LinkedHashMap<>();
     }
 
     public double getTotalRevenue() {
@@ -48,12 +48,12 @@ public class SalesReport {
         this.paymentBreakdown = paymentBreakdown;
     }
 
-    public java.util.Map<String, Double> getDailyRevenue() {
-        return dailyRevenue;
+    public java.util.Map<String, Double> getRevenueSeries() {
+        return revenueSeries;
     }
 
-    public void setDailyRevenue(java.util.Map<String, Double> dailyRevenue) {
-        this.dailyRevenue = dailyRevenue;
+    public void setRevenueSeries(java.util.Map<String, Double> revenueSeries) {
+        this.revenueSeries = revenueSeries;
     }
 
     public TopItem getBestSeller() {
