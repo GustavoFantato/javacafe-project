@@ -18,6 +18,7 @@ import java.util.Locale;
  * Entry point for the Java Cafe POS application.
  * Bootstraps the JavaFX environment and initializes core services.
  */
+
 public class Main extends Application {
 
     private static InventoryService inventoryService;
@@ -40,17 +41,18 @@ public class Main extends Application {
             }
 
             // Sets default view
+            // When the project is started, it opens the main menu (order menu)
             changeScene("/fxml/order_entry.fxml");
 
-            primaryStage.setTitle("Java Café POS");
-            URL iconUrl = Main.class.getResource("/images/app-icon.png");
-            if (iconUrl != null) {
+            primaryStage.setTitle("Java Café POS"); // Application's title
+            URL iconUrl = Main.class.getResource("/images/app-icon.png"); // Application's icon
+            if (iconUrl != null) { //
                 primaryStage.getIcons().setAll(new javafx.scene.image.Image(iconUrl.toExternalForm()));
             }
-            primaryStage.setResizable(false);
-            primaryStage.show();
+            primaryStage.setResizable(true); // It allows the user to resize the window
+            primaryStage.show(); // shows the application's window
 
-        } catch (Exception e) {
+        } catch (Exception e) { // exception handling
             System.err.println("[CRITICAL] Failed to load JavaFX GUI.");
             e.printStackTrace();
         }
@@ -63,11 +65,11 @@ public class Main extends Application {
      */
     public static void changeScene(String fxmlPath) {
         try {
-            FXMLLoader loader = new FXMLLoader(Main.class.getResource(fxmlPath));
-            BorderPane root = loader.load();
+            FXMLLoader loader = new FXMLLoader(Main.class.getResource(fxmlPath)); // gets the path
+            BorderPane root = loader.load(); // reads the fxml and transforms in the objects
 
             // Dependency Injection mapping
-            Object controller = loader.getController();
+            Object controller = loader.getController(); // instances the controller and vinculates it to the correct controller
             if (controller instanceof OrderEntryController) {
                 ((OrderEntryController) controller).setServices(inventoryService, checkoutService);
             } else if (controller instanceof InventoryController) {
@@ -76,7 +78,8 @@ public class Main extends Application {
                 ((ReportsController) controller).setReportsService(reportsService);
             }
 
-            // Setup scene only on first load to prevent flickering
+            // Setup scene only on the first load to prevent flickering
+            // It reveals the scene only when it is full loaded on the background
             if (primaryStage.getScene() == null) {
                 Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
                 scene.getStylesheets().add(Main.class.getResource("/css/style.css").toExternalForm());
@@ -94,13 +97,14 @@ public class Main extends Application {
         // Enforce US locale to avoid CSV parsing issues with decimal separators (',' vs '.')
         Locale.setDefault(Locale.US);
 
-        System.out.println("=== INITIALIZING JAVA CAFE INFRASTRUCTURE ===");
+        System.out.println("=== INITIALIZING JAVA CAFE INFRASTRUCTURE ==="); // console logs
 
+        // Objects instances
         inventoryService = new InventoryService(STORAGE_PATH);
         checkoutService = new CheckoutService(inventoryService, SALES_PATH);
         reportsService = new ReportsService(SALES_PATH);
 
-        System.out.println("\n=== OPENING JAVAFX GUI ===");
-        launch(args);
+        System.out.println("\n=== OPENING JAVAFX GUI ==="); // console logs
+        launch(args); // when launch is called, the main thread pauses, and the JavaFX starts (and make everything it got to do)
     }
 }
