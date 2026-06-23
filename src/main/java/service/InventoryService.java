@@ -105,7 +105,7 @@ public class InventoryService {
             p.decreaseStock(qtd);
             saveInventory();
         } else {
-            throw new exception.OutOfStockException("Produto com ID " + id + " não encontrado.");
+            throw new exception.OutOfStockException("Product with ID " + id + " not found.");
         }
     }
 
@@ -243,7 +243,7 @@ public class InventoryService {
             double price = Double.parseDouble(tokens[4].trim());
             int stockQtd = Integer.parseInt(tokens[5].trim());
 
-            int lowStockThreshold = Product.DEFAULT_LOW_STOCK_THRESHOLD;
+            int lowStockThreshold = Product.DEFAULT_LOW_STOCK;
             String imagePath;
             String description;
 

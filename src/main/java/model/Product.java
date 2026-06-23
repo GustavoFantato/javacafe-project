@@ -5,7 +5,7 @@ import model.enums.Category;
 import model.enums.Size;
 
 public class Product {
-    public static final int DEFAULT_LOW_STOCK_THRESHOLD = 5;
+    public static final int DEFAULT_LOW_STOCK = 5;
 
     private String name;
     private Size size;
@@ -20,7 +20,7 @@ public class Product {
 
     public Product(int id, String name, double price, int stockQtd, String imagePath,
                    Size size, Category category, String description) {
-        this(id, name, price, stockQtd, imagePath, size, category, description, DEFAULT_LOW_STOCK_THRESHOLD);
+        this(id, name, price, stockQtd, imagePath, size, category, description, DEFAULT_LOW_STOCK);
     }
 
     public Product(int id, String name, double price, int stockQtd, String imagePath,

@@ -17,9 +17,7 @@ import service.InventoryService;
 import util.ProductImageResolver;
 import util.ProductImageStorage;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -98,11 +96,11 @@ public class InventoryController {
         tabEditProduct.setToggleGroup(formTabs);
 
         SpinnerValueFactory<Integer> newThresholdFactory =
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 999, Product.DEFAULT_LOW_STOCK_THRESHOLD);
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 999, Product.DEFAULT_LOW_STOCK);
         newThresholdSpinner.setValueFactory(newThresholdFactory);
 
         SpinnerValueFactory<Integer> editThresholdFactory =
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 999, Product.DEFAULT_LOW_STOCK_THRESHOLD);
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 999, Product.DEFAULT_LOW_STOCK);
         editThresholdSpinner.setValueFactory(editThresholdFactory);
 
         SpinnerValueFactory<Integer> restockFactory =
@@ -248,7 +246,7 @@ public class InventoryController {
         newCategoryCombo.getSelectionModel().clearSelection();
         newPriceField.clear();
         newStockField.clear();
-        newThresholdSpinner.getValueFactory().setValue(Product.DEFAULT_LOW_STOCK_THRESHOLD);
+        newThresholdSpinner.getValueFactory().setValue(Product.DEFAULT_LOW_STOCK);
         newDescField.clear();
     }
 
