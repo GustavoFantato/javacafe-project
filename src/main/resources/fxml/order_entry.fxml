@@ -36,9 +36,9 @@
     </top>
 
     <center>
-        <HBox spacing="0">
+        <HBox spacing="0" VBox.vgrow="ALWAYS">
 
-            <VBox prefWidth="760" spacing="12" styleClass="panel-left">
+            <VBox HBox.hgrow="ALWAYS" minHeight="0" minWidth="400" prefWidth="760" spacing="12" styleClass="panel-left">
                 <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
 
                 <HBox alignment="CENTER_LEFT" spacing="8">
@@ -83,10 +83,15 @@
                     <TextField fx:id="filterPriceField" onKeyReleased="#onSearch" prefWidth="90" promptText="R$ 0,00" style="-fx-padding: 4 8 4 8;" styleClass="customer-field" />
                 </HBox>
 
-                <Pagination fx:id="menuPagination" maxPageIndicatorCount="6" VBox.vgrow="ALWAYS" />
+                <VBox minHeight="0" spacing="8" VBox.vgrow="ALWAYS">
+                    <ScrollPane fx:id="menuScrollPane" fitToWidth="true" hbarPolicy="NEVER" minHeight="0" styleClass="menu-scroll" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
+                        <FlowPane fx:id="menuGrid" hgap="12" vgap="12" />
+                    </ScrollPane>
+                    <Pagination fx:id="menuPagination" maxPageIndicatorCount="6" />
+                </VBox>
             </VBox>
 
-            <VBox prefWidth="520" spacing="0" styleClass="panel-right">
+            <VBox minWidth="380" prefWidth="520" spacing="0" styleClass="panel-right">
 
                 <HBox alignment="CENTER_LEFT" spacing="12" styleClass="order-header">
                     <padding><Insets bottom="16" left="20" right="20" top="16" /></padding>

@@ -15,7 +15,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import model.Order;
@@ -47,6 +47,8 @@ public class OrderEntryController {
     @FXML private ComboBox<String> filterSizeCombo;
     @FXML private ComboBox<String> filterPriceOperatorCombo;
     @FXML private TextField filterPriceField;
+    @FXML private ScrollPane menuScrollPane;
+    @FXML private FlowPane menuGrid;
     @FXML private Pagination menuPagination;
     @FXML private Label orderIdLabel;
     @FXML private TextField customerNameField;
@@ -120,6 +122,11 @@ public class OrderEntryController {
 
         filterSizeCombo.getSelectionModel().selectFirst(); // P, M, G filter
         filterPriceOperatorCombo.getSelectionModel().selectFirst(); // Price filter
+
+        menuGrid.setPadding(new Insets(4));
+        menuGrid.setPrefWrapLength(MENU_GRID_WRAP_LENGTH);
+        menuScrollPane.widthProperty().addListener((obs, old, w) ->
+                menuGrid.setPrefWrapLength(Math.max(w.doubleValue() - 24, MENU_CARD_WIDTH)));
 
         // Clock updated (screen's bottom)
         Timeline clock = new Timeline(new KeyFrame(Duration.seconds(30), e -> updateClock()));
@@ -392,26 +399,31 @@ public class OrderEntryController {
         clockLabel.setText(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
     }
 
-    // creates the menu page
+    // creates the menu page (Pagination pageFactory; content lives in menuGrid)
     private Node createMenuPage(Integer pageIndex) {
-        FlowPane pageGrid = new FlowPane(12, 12);
-        pageGrid.setPadding(new Insets(4));
-        pageGrid.setPrefWrapLength(MENU_GRID_WRAP_LENGTH);
+        updateMenuGrid(pageIndex);
+        return new Region();
+    }
+
+    private void updateMenuGrid(int pageIndex) {
+        menuGrid.getChildren().clear();
+
+        if (filteredProducts.isEmpty()) {
+            Label emptyLabel = new Label("Nenhum produto encontrado.");
+            emptyLabel.getStyleClass().add("menu-empty-state");
+            menuGrid.getChildren().add(emptyLabel);
+            menuScrollPane.setVvalue(0);
+            return;
+        }
 
         int start = pageIndex * ITEMS_PER_PAGE;
         int end = Math.min(start + ITEMS_PER_PAGE, filteredProducts.size());
 
-        if (filteredProducts.isEmpty()) {
-            StackPane emptyPane = new StackPane(new Label("Nenhum produto encontrado."));
-            emptyPane.getStyleClass().add("menu-empty-state");
-            return emptyPane;
-        }
-
         for (int i = start; i < end; i++) {
-            pageGrid.getChildren().add(buildMenuCard(filteredProducts.get(i)));
+            menuGrid.getChildren().add(buildMenuCard(filteredProducts.get(i)));
         }
 
-        return pageGrid;
+        menuScrollPane.setVvalue(0);
     }
 
     // builds the product's menu card

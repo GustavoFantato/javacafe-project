@@ -50,6 +50,8 @@ public class Main extends Application {
                 primaryStage.getIcons().setAll(new javafx.scene.image.Image(iconUrl.toExternalForm()));
             }
             primaryStage.setResizable(true); // It allows the user to resize the window
+            primaryStage.setMinWidth(900);
+            primaryStage.setMinHeight(650);
             primaryStage.show(); // shows the application's window
 
         } catch (Exception e) { // exception handling
