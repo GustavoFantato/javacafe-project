@@ -181,7 +181,7 @@ public class OrderEntryController {
                 };
                 products = inventoryService.findProductByPriceFilter(products, price, operator);
             } catch (NumberFormatException ignored) {
-                // mantém lista atual se preço inválido
+                // keeps the current list, if invalid price
             }
         }
 
