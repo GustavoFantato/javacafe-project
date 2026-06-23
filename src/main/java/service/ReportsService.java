@@ -8,8 +8,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.TextStyle;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -19,6 +17,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Service responsible for parsing sales data and generating business intelligence reports.
+ */
 public class ReportsService {
 
     private static final DateTimeFormatter FOOTER_DATE =
@@ -38,6 +39,13 @@ public class ReportsService {
         this.filePath = filePath;
     }
 
+    /**
+     * Reads the sales CSV file and aggregates data for the specified period and grouping.
+     * * @param start The start date of the reporting period.
+     * @param end The end date of the reporting period.
+     * @param grouping The granularity of the revenue data (Hourly, Daily, Weekly).
+     * @return A SalesReport object containing the aggregated metrics.
+     */
     public SalesReport generateReport(LocalDate start, LocalDate end, RevenueGrouping grouping) {
         SalesReport report = new SalesReport();
         report.setTop3(new TopItem[3]);
@@ -108,7 +116,7 @@ public class ReportsService {
                 }
             }
         } catch (Exception e) {
-            System.err.println("[Reports] Erro ao ler vendas: " + e.getMessage());
+            System.err.println("[Reports] Error reading sales: " + e.getMessage());
         }
 
         report.setTotalRevenue(totalRevenue);

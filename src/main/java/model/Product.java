@@ -4,6 +4,9 @@ import exception.OutOfStockException;
 import model.enums.Category;
 import model.enums.Size;
 
+/**
+ * Represents a sellable item inside the catalog and inventory system.
+ */
 public class Product {
     public static final int DEFAULT_LOW_STOCK = 5;
 
@@ -37,6 +40,11 @@ public class Product {
         idCounter = Math.max(idCounter, id);
     }
 
+    /**
+     * Deducts units from the product's available stock.
+     * * @param qtd Amount to be deducted.
+     * @throws OutOfStockException If the required quantity exceeds current stock.
+     */
     public void decreaseStock(int qtd) throws OutOfStockException {
         if (qtd > this.stockQtd) {
             throw new OutOfStockException("Estoque insuficiente para " + name + ". Disponível: " + stockQtd);
@@ -44,11 +52,15 @@ public class Product {
         setStockQtd(this.stockQtd - qtd);
     }
 
+    /**
+     * Adds units to the product's available stock.
+     * * @param qtd Amount to be added. Must be greater than zero.
+     */
     public void increaseStock(int qtd) {
         if (qtd > 0) {
             this.stockQtd += qtd;
         } else {
-            System.out.println("FAIL: You cannot add a value less than or equal to 0 to stock.");
+            System.out.println("[Product] FAIL: You cannot add a value less than or equal to 0 to stock.");
         }
     }
 

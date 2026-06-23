@@ -14,6 +14,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Locale;
 
+/**
+ * Entry point for the Java Cafe POS application.
+ * Bootstraps the JavaFX environment and initializes core services.
+ */
 public class Main extends Application {
 
     private static InventoryService inventoryService;
@@ -29,13 +33,13 @@ public class Main extends Application {
     public void start(Stage stage) {
         primaryStage = stage;
         try {
-            // Garante a existência do diretório de dados
+            // Ensures the data directory exists before writing any files
             File dataDir = new File("./data");
             if (!dataDir.exists()) {
                 dataDir.mkdirs();
             }
 
-            // Abre a tela inicial padrão (Pedidos)
+            // Sets default view
             changeScene("/fxml/order_entry.fxml");
 
             primaryStage.setTitle("Java Café POS");
@@ -47,20 +51,22 @@ public class Main extends Application {
             primaryStage.show();
 
         } catch (Exception e) {
-            System.err.println("CRITICAL: Falha ao carregar a interface gráfica do JavaFX.");
+            System.err.println("[CRITICAL] Failed to load JavaFX GUI.");
             e.printStackTrace();
         }
     }
 
     /**
-     * Troca de cena injetando dinamicamente as dependências dos microsserviços
+     * Swaps the current JavaFX scene and injects dependencies dynamically 
+     * based on the loaded controller.
+     * * @param fxmlPath The path to the FXML file to be loaded.
      */
     public static void changeScene(String fxmlPath) {
         try {
             FXMLLoader loader = new FXMLLoader(Main.class.getResource(fxmlPath));
             BorderPane root = loader.load();
 
-            // Injeta as dependências necessárias no controller que acabou de ser inflado
+            // Dependency Injection mapping
             Object controller = loader.getController();
             if (controller instanceof OrderEntryController) {
                 ((OrderEntryController) controller).setServices(inventoryService, checkoutService);
@@ -70,34 +76,31 @@ public class Main extends Application {
                 ((ReportsController) controller).setReportsService(reportsService);
             }
 
-            // Se for a primeira inicialização
+            // Setup scene only on first load to prevent flickering
             if (primaryStage.getScene() == null) {
                 Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
-                // Vincula o arquivo de estilo higienizado de forma segura
                 scene.getStylesheets().add(Main.class.getResource("/css/style.css").toExternalForm());
                 primaryStage.setScene(scene);
             } else {
-                // Reaproveita a Scene alterando apenas o nó raiz (evita flickering e perda de foco)
                 primaryStage.getScene().setRoot(root);
             }
         } catch (IOException e) {
-            System.err.println("Erro crítico ao navegar para a tela: " + fxmlPath);
+            System.err.println("[ERROR] Critical error navigating to screen: " + fxmlPath);
             e.printStackTrace();
         }
     }
 
     public static void main(String[] args) {
-        // Evita quebras de parseamento decimal no CSV (força ponto ao invés de vírgula)
+        // Enforce US locale to avoid CSV parsing issues with decimal separators (',' vs '.')
         Locale.setDefault(Locale.US);
 
-        System.out.println("=== INICIANDO INFRAESTRUTURA DO JAVA CAFE ===");
+        System.out.println("=== INITIALIZING JAVA CAFE INFRASTRUCTURE ===");
 
-        // Inicialização dos serviços globais
         inventoryService = new InventoryService(STORAGE_PATH);
         checkoutService = new CheckoutService(inventoryService, SALES_PATH);
         reportsService = new ReportsService(SALES_PATH);
 
-        System.out.println("\n=== ABRINDO INTERFACE GRAFICA JAVAFX ===");
+        System.out.println("\n=== OPENING JAVAFX GUI ===");
         launch(args);
     }
 }

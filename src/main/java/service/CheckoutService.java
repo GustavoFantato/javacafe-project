@@ -8,33 +8,36 @@ import service.enums.PaymentMethods;
 import java.io.*;
 import java.time.LocalDateTime;
 
+/**
+ * Handles payment validations, checkout processing, and sales logging.
+ */
 public class CheckoutService {
 
-    // Attributes
     private InventoryService inventoryService;
     private String filePath;
     private static int transactionId = 0;
 
-    // Constructor
     public CheckoutService(InventoryService inventoryService, String filePath) {
         this.inventoryService = inventoryService;
         this.filePath = filePath;
-        loadLastTransactionState(); // Gets the last transaction and order IDs from the sales csv
+        loadLastTransactionState(); 
     }
 
-    // Methods
-
-    // Process the payment method to its process
+    /**
+     * Validates if the payment method rules are satisfied before proceeding to checkout.
+     */
     public boolean processPayment(PaymentMethods paymentMethod, Order currentOrder, double cashReceived) throws InvalidPaymentException {
         PaymentService paymentService = PaymentService.forMethod(paymentMethod);
         paymentService.validate(currentOrder, cashReceived);
         return true;
     }
 
-    // Process, logs and saves the final sale into the CSV and decreases stock
+    /**
+     * Finalizes the sale: deducts stock, logs transaction to CSV, and updates order status.
+     */
     public void finishSale(Order currentOrder, PaymentMethods paymentMethod, double cashReceived) {
         currentOrder.ensureOrderId();
-        transactionId++; // Increments the transaction ID that will be logged
+        transactionId++; 
 
         java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy~HH:mm:ss");
         String timestamp = LocalDateTime.now().format(formatter);
@@ -48,6 +51,7 @@ public class CheckoutService {
         }
 
         try {
+            // Deduct items from inventory
             for (OrderItem item : currentOrder.getItems()) {
                 Product p = item.getProduct();
                 inventoryService.decreaseProductStock(p.getID(), item.getQtd());
@@ -63,44 +67,48 @@ public class CheckoutService {
                     writer.newLine();
                 }
 
+                // Write individual order items
                 for (OrderItem item : currentOrder.getItems()) {
                     Product p = item.getProduct();
 
                     String line = String.format(java.util.Locale.US, "%d,%d,%d,%s,%d,%.2f,%.2f",
-                            transactionId,              // saleId
-                            orderId,                    // orderId
-                            p.getID(),                  // productId
-                            p.getName(),                // productName
-                            item.getQtd(),              // quantity
-                            p.getPrice(),               // unitPrice
-                            item.getSubtotal()          // subtotal price
+                            transactionId,              
+                            orderId,                    
+                            p.getID(),                  
+                            p.getName(),                
+                            item.getQtd(),              
+                            p.getPrice(),               
+                            item.getSubtotal()          
                     );
                     writer.write(line);
                     writer.newLine();
                 }
 
+                // Write transaction footer summary
                 String changeLine = String.format(java.util.Locale.US, "%c,%d,%s,%d,%s,%.2f,%.2f",
-                        'f',                      // footer identifier
-                        transactionId,                  // saleId
-                        timestamp,                      // timestamp
-                        orderId,                        // orderId
-                        paymentMethod.name(),           // paymentMethod
-                        cartCost,                       // totalPrice with tax
-                        change                          // change
+                        'f',                      
+                        transactionId,                  
+                        timestamp,                      
+                        orderId,                        
+                        paymentMethod.name(),           
+                        cartCost,                       
+                        change                          
                 );
                 writer.write(changeLine);
                 writer.newLine();
             }
 
-            // Sets the STATUS as PAID
             currentOrder.setStatus(model.enums.Status.PAID);
-            System.out.println("[Checkout] " + currentOrder.toString());
+            System.out.println("[Checkout] Order finalized: " + currentOrder.toString());
 
         } catch (Exception e) {
-            System.err.println("ERROR during finishSale: " + e.getMessage());
+            System.err.println("[Checkout] Error during finishSale: " + e.getMessage());
         }
     }
 
+    /**
+     * Parses the CSV file on startup to resume transaction and order IDs sequentially.
+     */
     private void loadLastTransactionState() {
         File file = new File(this.filePath);
         if (!file.exists() || file.length() == 0) {
@@ -131,7 +139,7 @@ public class CheckoutService {
             transactionId = lastTransactionId;
             Order.syncCounter(lastOrderId);
         } catch (Exception e) {
-            System.err.println("[Checkout] Could not load last transaction ID. Error: " + e.getMessage());
+            System.err.println("[Checkout] Could not load last transaction state. Error: " + e.getMessage());
         }
     }
 

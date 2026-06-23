@@ -9,6 +9,9 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Manages the product catalog, stock levels, and handles inventory CSV persistence.
+ */
 public class InventoryService {
 
     private static final String CSV_HEADER =
@@ -23,6 +26,9 @@ public class InventoryService {
         loadInventory();
     }
 
+    /**
+     * Loads the entire inventory from the storage CSV into memory.
+     */
     public void loadInventory() {
         this.storageList.clear();
 
@@ -48,10 +54,13 @@ public class InventoryService {
             }
 
         } catch (Exception e) {
-            System.err.println("An error occurred while reading storage file: " + e.getMessage());
+            System.err.println("[Inventory] An error occurred while reading storage file: " + e.getMessage());
         }
     }
 
+    /**
+     * Overwrites the CSV file with the current state of the inventory list in memory.
+     */
     public void saveInventory() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.filePath))) {
             writer.write(CSV_HEADER);
@@ -73,10 +82,10 @@ public class InventoryService {
                 writer.write(line);
                 writer.newLine();
             }
-            System.out.printf("LOG: Storage saved successfully [%s]!\n", filePath);
+            System.out.printf("[Inventory] Storage saved successfully [%s]!\n", filePath);
 
         } catch (Exception e) {
-            System.err.println("An error occurred while writing storage file: " + e.getMessage());
+            System.err.println("[Inventory] An error occurred while writing storage file: " + e.getMessage());
         }
     }
 
@@ -105,7 +114,7 @@ public class InventoryService {
             p.decreaseStock(qtd);
             saveInventory();
         } else {
-            throw new exception.OutOfStockException("Product with ID " + id + " not found.");
+            throw new exception.OutOfStockException("Produto com ID " + id + " não encontrado.");
         }
     }
 
@@ -116,7 +125,7 @@ public class InventoryService {
             p.increaseStock(qtd);
             saveInventory();
         } else {
-            System.err.println("FAIL: Product with ID " + id + " not found!");
+            System.err.println("[Inventory] FAIL: Product with ID " + id + " not found!");
         }
     }
 
@@ -180,9 +189,9 @@ public class InventoryService {
         if (isWellFormatedProduct(newProd)) {
             storageList.add(newProd);
             saveInventory();
-            System.out.println("LOG: Product added successfully!");
+            System.out.println("[Inventory] LOG: Product added successfully!");
         } else {
-            System.out.println("FAIL: Bad formatted product!");
+            System.out.println("[Inventory] FAIL: Bad formatted product!");
         }
     }
 
@@ -192,22 +201,22 @@ public class InventoryService {
         if (p != null) {
             storageList.remove(p);
             saveInventory();
-            System.out.println("LOG: Product removed successfully!");
+            System.out.println("[Inventory] LOG: Product removed successfully!");
         } else {
-            System.err.println("FAIL: Product not found!");
+            System.err.println("[Inventory] FAIL: Product not found!");
         }
     }
 
     public void updateProductStorage(Product updatedProd) {
         if (!isWellFormatedProduct(updatedProd)) {
-            System.err.println("FAIL: Cannot update. Product contains formatting errors!");
+            System.err.println("[Inventory] FAIL: Cannot update. Product contains formatting errors!");
             return;
         }
 
         Product oldProd = findProductById(updatedProd.getID());
 
         if (oldProd == null) {
-            System.err.println("FAIL: Cannot update. Product ID " + updatedProd.getID() + " not found.");
+            System.err.println("[Inventory] FAIL: Cannot update. Product ID " + updatedProd.getID() + " not found.");
             return;
         }
 
@@ -221,7 +230,7 @@ public class InventoryService {
         oldProd.setDescription(updatedProd.getDescription());
 
         saveInventory();
-        System.out.println("LOG: Product ID " + updatedProd.getID() + " updated successfully!");
+        System.out.println("[Inventory] LOG: Product ID " + updatedProd.getID() + " updated successfully!");
     }
 
     public List<Product> getStorageList() {
@@ -258,7 +267,7 @@ public class InventoryService {
 
             return new Product(id, name, price, stockQtd, imagePath, size, category, description, lowStockThreshold);
         } catch (Exception e) {
-            System.err.println("Ignoring invalid line [storage.csv]: " + line + " -> Error: " + e.getMessage());
+            System.err.println("[Inventory] Ignoring invalid line [storage.csv]: " + line + " -> Error: " + e.getMessage());
             return null;
         }
     }
@@ -274,39 +283,39 @@ public class InventoryService {
 
     public boolean isWellFormatedProduct(Product p) {
         if (p == null) {
-            System.err.println("VALIDATION FAIL: Product object is null.");
+            System.err.println("[Inventory] VALIDATION FAIL: Product object is null.");
             return false;
         }
         if (p.getID() <= 0) {
-            System.err.println("VALIDATION FAIL: ID must be greater than 0.");
+            System.err.println("[Inventory] VALIDATION FAIL: ID must be greater than 0.");
             return false;
         }
         if (p.getName() == null || p.getName().trim().isEmpty()) {
-            System.err.println("VALIDATION FAIL: Product name cannot be empty.");
+            System.err.println("[Inventory] VALIDATION FAIL: Product name cannot be empty.");
             return false;
         }
         if (p.getSize() == null) {
-            System.err.println("VALIDATION FAIL: Product size (Enum) cannot be null.");
+            System.err.println("[Inventory] VALIDATION FAIL: Product size (Enum) cannot be null.");
             return false;
         }
         if (p.getCategory() == null) {
-            System.err.println("VALIDATION FAIL: Product category (Enum) cannot be null.");
+            System.err.println("[Inventory] VALIDATION FAIL: Product category (Enum) cannot be null.");
             return false;
         }
         if (p.getPrice() <= 0.0) {
-            System.err.println("VALIDATION FAIL: Price must be greater than 0.");
+            System.err.println("[Inventory] VALIDATION FAIL: Price must be greater than 0.");
             return false;
         }
         if (p.getStockQtd() < 0) {
-            System.err.println("VALIDATION FAIL: Stock quantity cannot be negative.");
+            System.err.println("[Inventory] VALIDATION FAIL: Stock quantity cannot be negative.");
             return false;
         }
         if (p.getLowStockThreshold() < 0) {
-            System.err.println("VALIDATION FAIL: Low stock threshold cannot be negative.");
+            System.err.println("[Inventory] VALIDATION FAIL: Low stock threshold cannot be negative.");
             return false;
         }
         if (p.getImagePath() == null || p.getImagePath().trim().isEmpty()) {
-            System.err.println("VALIDATION FAIL: Image path cannot be empty.");
+            System.err.println("[Inventory] VALIDATION FAIL: Image path cannot be empty.");
             return false;
         }
 
