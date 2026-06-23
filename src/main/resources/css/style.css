@@ -1,5 +1,5 @@
 /* ═════════════════════════════════════════════════════════════════════
-   ☕ JAVA CAFÉ - GLOBAL & PALETTE CONSTANTS
+   JAVA CAFE - GLOBAL & PALETTE CONSTANTS
    ═════════════════════════════════════════════════════════════════════ */
 .root {
     -fx-primary-color: #5D4037;       /* Marrom Café Escuro */
@@ -17,7 +17,7 @@
 }
 
 /* ═════════════════════════════════════════════════════════════════════
-   🔝 TOP BAR & NAVIGATION
+   TOP BAR & NAVIGATION
    ═════════════════════════════════════════════════════════════════════ */
 .top-bar {
     -fx-background-color: #5D4037;
@@ -52,7 +52,7 @@
 }
 
 /* ═════════════════════════════════════════════════════════════════════
-   🗂️ LAYOUT PANELS (LEFT & RIGHT SPLIT)
+   LAYOUT PANELS (LEFT & RIGHT SPLIT)
    ═════════════════════════════════════════════════════════════════════ */
 .panel-left {
     -fx-background-color: #FDFBF7;
@@ -71,7 +71,7 @@
 }
 
 /* ═════════════════════════════════════════════════════════════════════
-   🖱️ CONTROLS & INPUT FIELDS (Buttons, Toggles, TextFields)
+   CONTROLS & INPUT FIELDS (Buttons, Toggles, TextFields)
    ═════════════════════════════════════════════════════════════════════ */
 .search-field, .form-field, .customer-field, .cash-field {
     -fx-background-color: #FFFFFF;
@@ -116,7 +116,7 @@
 }
 
 /* ═════════════════════════════════════════════════════════════════════
-   🔘 BUTTONS STYLE
+   BUTTONS STYLE
    ═════════════════════════════════════════════════════════════════════ */
 .btn-primary {
     -fx-background-color: #2E7D32;
@@ -159,7 +159,7 @@
 .btn-ghost:hover { -fx-background-color: rgba(141, 110, 99, 0.1); }
 
 /* ═════════════════════════════════════════════════════════════════════
-   📊 TABLES (TableView, TableColumns, ScrollPanes)
+   TABLES (TableView, TableColumns, ScrollPanes)
    ═════════════════════════════════════════════════════════════════════ */
 .table-view {
     -fx-background-color: transparent;
@@ -202,7 +202,7 @@
 .menu-scroll .viewport { -fx-background-color: transparent; }
 
 /* ═════════════════════════════════════════════════════════════════════
-   💰 TOTALS & CACHE VALUES (Checkout Panel Summary)
+   TOTALS & CACHE VALUES (Checkout Panel Summary)
    ═════════════════════════════════════════════════════════════════════ */
 .totals-box {
     -fx-background-color: #FAF6F0;
@@ -219,7 +219,7 @@
 .change-value { -fx-text-fill: #2E7D32; -fx-font-size: 16px; -fx-font-weight: bold; }
 
 /* ═════════════════════════════════════════════════════════════════════
-   📉 DASHBOARD REPORTS & KPI CARDS
+   DASHBOARD REPORTS & KPI CARDS
    ═════════════════════════════════════════════════════════════════════ */
 .kpi-row {
     -fx-background-color: #F5F5F5;
@@ -252,7 +252,7 @@
 .default-color0.chart-bar { -fx-bar-fill: #8D6E63; }
 
 /* ═════════════════════════════════════════════════════════════════════
-   📑 TABS (Inventory Form Swapper)
+   TABS (Inventory Form Swapper)
    ═════════════════════════════════════════════════════════════════════ */
 .form-tab {
     -fx-background-color: #F5F5F5;
@@ -275,7 +275,7 @@
 }
 
 /* ═════════════════════════════════════════════════════════════════════
-   🚨 ALERT BANNERS & STATUS BARS
+   ALERT BANNERS & STATUS BARS
    ═════════════════════════════════════════════════════════════════════ */
 .alert-banner {
     -fx-background-color: #FFF3E0;
@@ -295,7 +295,7 @@
 .status-clock { -fx-text-fill: #3E2723; -fx-size: 12px; -fx-font-weight: bold; }
 
 /* ═════════════════════════════════════════════════════════════════════
-   🍽️ MENU CARDS & PAGINATION
+   MENU CARDS & PAGINATION
    ═════════════════════════════════════════════════════════════════════ */
 .menu-card {
     -fx-background-color: #FFFFFF;
@@ -389,7 +389,7 @@
 }
 
 /* ═════════════════════════════════════════════════════════════════════
-   📈 REPORT TOGGLES & LINE CHART
+   REPORT TOGGLES & LINE CHART
    ═════════════════════════════════════════════════════════════════════ */
 .chart-toggle-btn {
     -fx-background-color: #FFFFFF;
@@ -422,7 +422,7 @@
 }
 
 /* ═════════════════════════════════════════════════════════════════════
-   📊 REPORTS PAGE
+   REPORTS PAGE
    ═════════════════════════════════════════════════════════════════════ */
 .report-controls {
     -fx-background-color: #FFFFFF;

@@ -338,15 +338,15 @@ public class OrderEntryController {
             stockAlertLabel.setText("");
         } else if (lowStock.size() == 1) {
             Product p = lowStock.get(0);
-            stockAlertLabel.setText(String.format("⚠ Estoque baixo: %s (%d un.)", p.getName(), p.getStockQtd()));
+            stockAlertLabel.setText(String.format("Estoque baixo: %s (%d un.)", p.getName(), p.getStockQtd()));
         } else {
-            stockAlertLabel.setText(String.format("⚠ %d produtos com estoque baixo", lowStock.size()));
+            stockAlertLabel.setText(String.format("%d produtos com estoque baixo", lowStock.size()));
         }
     }
 
     private void setupRemoveColumn() {
         colRemove.setCellFactory(col -> new TableCell<>() {
-            private final Button removeBtn = new Button("✕");
+            private final Button removeBtn = new Button("X");
 
             {
                 removeBtn.getStyleClass().add("btn-ghost-small");

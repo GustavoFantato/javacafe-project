@@ -27,7 +27,7 @@ public class ReceiptService {
                                double cashReceived, double change) {
         StringBuilder sb = new StringBuilder();
         sb.append("========================================\n");
-        sb.append("           ☕ JAVA CAFÉ\n");
+        sb.append("           JAVA CAFE\n");
         sb.append("========================================\n");
         sb.append(String.format(Locale.US, "Pedido: #%03d%n", order.getOrderID()));
         sb.append("Data: ").append(LocalDateTime.now().format(RECEIPT_TIME)).append("\n");

@@ -18,12 +18,12 @@
         <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="16">
             <padding><Insets top="12" right="20" bottom="12" left="20"/></padding>
 
-            <Label text="☕  Java Café" styleClass="app-title"/>
+            <Label text="Java Café" styleClass="app-title"/>
             <Region HBox.hgrow="ALWAYS"/>
 
-            <Button text="📋  Pedidos"    styleClass="nav-btn" onAction="#goToOrders"/>
-            <Button text="📦  Estoque"    styleClass="nav-btn, nav-active" onAction="#goToInventory"/>
-            <Button text="📊  Relatórios" styleClass="nav-btn" onAction="#goToReports"/>
+            <Button text="Pedidos"    styleClass="nav-btn" onAction="#goToOrders"/>
+            <Button text="Estoque"    styleClass="nav-btn, nav-active" onAction="#goToInventory"/>
+            <Button text="Relatórios" styleClass="nav-btn" onAction="#goToReports"/>
         </HBox>
     </top>
 
@@ -38,7 +38,7 @@
                     <Region HBox.hgrow="ALWAYS"/>
 
                     <TextField fx:id="inventorySearchField"
-                               promptText="🔍  Buscar produto..."
+                               promptText="Buscar produto..."
                                styleClass="search-field"
                                prefWidth="200"
                                onKeyReleased="#onSearch"/>
@@ -63,7 +63,7 @@
                       alignment="CENTER_LEFT" spacing="10"
                       managed="false" visible="false">
                     <padding><Insets top="8" right="14" bottom="8" left="14"/></padding>
-                    <Label text="⚠" styleClass="alert-icon"/>
+                    <Label text="!" styleClass="alert-icon"/>
                     <Label fx:id="alertBannerText"
                            text="Atenção: alguns itens estão com estoque baixo!"
                            styleClass="alert-text"/>
@@ -89,9 +89,9 @@
                 <HBox spacing="24" alignment="CENTER_LEFT" styleClass="table-footer">
                     <padding><Insets top="8" right="12" bottom="8" left="12"/></padding>
                     <Label fx:id="totalProductsLabel"  text="Total: 0 produtos"     styleClass="footer-stat"/>
-                    <Label fx:id="lowStockCountLabel"  text="⚠ Estoque baixo: 0"   styleClass="footer-stat-warn"/>
+                    <Label fx:id="lowStockCountLabel"  text="Estoque baixo: 0"   styleClass="footer-stat-warn"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Button text="⬇  Exportar CSV" styleClass="btn-ghost" onAction="#exportCSV"/>
+                    <Button text="Exportar CSV" styleClass="btn-ghost" onAction="#exportCSV"/>
                 </HBox>
             </VBox>
 
@@ -99,12 +99,12 @@
 
                 <HBox styleClass="form-header" alignment="CENTER_LEFT" spacing="0">
                     <ToggleButton fx:id="tabAddProduct"
-                                  text="➕  Novo Produto"
+                                  text="Novo Produto"
                                   styleClass="form-tab, form-tab-active"
                                   selected="true"
                                   onAction="#switchToAdd"/>
                     <ToggleButton fx:id="tabEditProduct"
-                                  text="✏  Editar / Repor"
+                                  text="Editar / Repor"
                                   styleClass="form-tab"
                                   onAction="#switchToEdit"/>
                 </HBox>
@@ -173,7 +173,7 @@
                         <HBox spacing="10">
                             <Button text="Limpar" styleClass="btn-secondary" prefWidth="120"
                                     onAction="#clearAddForm"/>
-                            <Button text="✅  Adicionar Produto" styleClass="btn-primary"
+                            <Button text="Adicionar Produto" styleClass="btn-primary"
                                     HBox.hgrow="ALWAYS" maxWidth="Infinity"
                                     onAction="#addProduct"/>
                         </HBox>
@@ -230,7 +230,7 @@
                             </VBox>
                         </HBox>
 
-                        <Button text="💾  Salvar Alterações" styleClass="btn-secondary"
+                        <Button text="Salvar Alterações" styleClass="btn-secondary"
                                 maxWidth="Infinity" onAction="#saveEdits"/>
 
                         <Separator/>
@@ -252,12 +252,12 @@
                             <Label fx:id="currentStockLabel" text="—" styleClass="stock-value"/>
                         </HBox>
 
-                        <Button text="📦  Repor Estoque" styleClass="btn-primary"
+                        <Button text="Repor Estoque" styleClass="btn-primary"
                                 maxWidth="Infinity" onAction="#restockProduct"/>
 
                         <Separator/>
 
-                        <Button text="🗑  Remover Produto" styleClass="btn-danger"
+                        <Button text="Remover Produto" styleClass="btn-danger"
                                 maxWidth="Infinity" onAction="#removeProduct"/>
 
                     </VBox>

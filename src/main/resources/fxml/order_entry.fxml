@@ -25,13 +25,13 @@
         <HBox alignment="CENTER_LEFT" spacing="16" styleClass="top-bar">
             <padding><Insets bottom="12" left="20" right="20" top="12" /></padding>
 
-            <Label styleClass="app-title" text="☕  Java Café" />
+            <Label styleClass="app-title" text="Java Café" />
 
             <Region HBox.hgrow="ALWAYS" />
 
-            <Button onAction="#goToOrders" styleClass="nav-btn, nav-active" text="📋  Pedidos" />
-            <Button onAction="#goToInventory" styleClass="nav-btn" text="📦  Estoque" />
-            <Button onAction="#goToReports" styleClass="nav-btn" text="📊  Relatórios" />
+            <Button onAction="#goToOrders" styleClass="nav-btn, nav-active" text="Pedidos" />
+            <Button onAction="#goToInventory" styleClass="nav-btn" text="Estoque" />
+            <Button onAction="#goToReports" styleClass="nav-btn" text="Relatórios" />
         </HBox>
     </top>
 
@@ -50,7 +50,7 @@
                     <ToggleButton fx:id="catDessert" onAction="#filterCategory" styleClass="cat-btn" text="Sobremesas" userData="DESSERTS" />
                 </HBox>
 
-                <TextField fx:id="searchField" onKeyReleased="#onSearch" promptText="🔍  Buscar por nome do produto..." styleClass="search-field" />
+                <TextField fx:id="searchField" onKeyReleased="#onSearch" promptText="Buscar por nome do produto..." styleClass="search-field" />
 
                 <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #fcf9f5; -fx-padding: 8; -fx-background-radius: 6;">
 
@@ -90,7 +90,7 @@
 
                 <HBox alignment="CENTER_LEFT" spacing="12" styleClass="order-header">
                     <padding><Insets bottom="16" left="20" right="20" top="16" /></padding>
-                    <Label styleClass="order-header-title" text="🧾  Pedido Atual" />
+                    <Label styleClass="order-header-title" text="Pedido Atual" />
                     <Region HBox.hgrow="ALWAYS" />
                     <Label fx:id="orderIdLabel" styleClass="order-id-badge" text="#001" />
                     <Button onAction="#newOrder" styleClass="btn-ghost" text="Novo" />
@@ -163,9 +163,9 @@
 
                 <HBox spacing="10" styleClass="action-bar">
                     <padding><Insets bottom="20" left="20" right="20" top="14" /></padding>
-                    <Button onAction="#clearOrder" prefWidth="120" styleClass="btn-secondary" text="🗑  Limpar" />
+                    <Button onAction="#clearOrder" prefWidth="120" styleClass="btn-secondary" text="Limpar" />
                     <Region HBox.hgrow="ALWAYS" />
-                    <Button onAction="#finalizeOrder" prefHeight="44.0" prefWidth="184.0" styleClass="btn-primary" text="✅  Finalizar Venda" />
+                    <Button onAction="#finalizeOrder" prefHeight="44.0" prefWidth="184.0" styleClass="btn-primary" text="Finalizar Venda" />
                 </HBox>
 
             </VBox>

@@ -150,7 +150,7 @@ public class InventoryController {
         }
 
         totalProductsLabel.setText(String.format("Total: %d produtos", total));
-        lowStockCountLabel.setText(String.format("⚠ Estoque baixo: %d", lowCount));
+        lowStockCountLabel.setText(String.format("Estoque baixo: %d", lowCount));
 
         if (lowCount > 0) {
             alertBannerText.setText(String.format("Atenção: %d item(ns) com estoque baixo!", lowCount));
@@ -234,7 +234,7 @@ public class InventoryController {
                     Size.M, mapPtToCategoryEnum(categoryLabel), description, threshold);
 
             inventoryService.addProductStorage(product);
-            formStatusLabel.setText("✅ Produto adicionado com sucesso!");
+            formStatusLabel.setText("Produto adicionado com sucesso!");
             clearAddForm();
             refreshTableAndMetrics();
         } catch (NumberFormatException e) {
@@ -288,7 +288,7 @@ public class InventoryController {
             inventoryService.updateProductStorage(updated);
             editImageField.setText(imagePath);
             refreshImagePreview(imagePath);
-            formStatusLabel.setText("✅ Alterações salvas!");
+            formStatusLabel.setText("Alterações salvas!");
             refreshTableAndMetrics();
         } catch (NumberFormatException e) {
             formStatusLabel.setText("Erro: Preço inválido!");
@@ -311,7 +311,7 @@ public class InventoryController {
         if (selectedProduct != null) {
             loadProductIntoEditForm(selectedProduct);
         }
-        formStatusLabel.setText(String.format("📦 +%d unidades adicionadas ao estoque.", amount));
+        formStatusLabel.setText(String.format("+%d unidades adicionadas ao estoque.", amount));
         refreshTableAndMetrics();
     }
 
@@ -334,7 +334,7 @@ public class InventoryController {
             editNameField.clear();
             editPriceField.clear();
             currentStockLabel.setText("—");
-            formStatusLabel.setText("❌ Produto removido!");
+            formStatusLabel.setText("Produto removido!");
             refreshTableAndMetrics();
         }
     }

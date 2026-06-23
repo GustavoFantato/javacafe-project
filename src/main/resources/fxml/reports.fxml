@@ -23,12 +23,12 @@
         <HBox alignment="CENTER_LEFT" spacing="16" styleClass="top-bar">
             <padding><Insets bottom="12" left="20" right="20" top="12" /></padding>
 
-            <Label styleClass="app-title" text="☕  Java Café" />
+            <Label styleClass="app-title" text="Java Café" />
             <Region HBox.hgrow="ALWAYS" />
 
-            <Button onAction="#goToOrders" styleClass="nav-btn" text="📋  Pedidos" />
-            <Button onAction="#goToInventory" styleClass="nav-btn" text="📦  Estoque" />
-            <Button onAction="#goToReports" styleClass="nav-btn, nav-active" text="📊  Relatórios" />
+            <Button onAction="#goToOrders" styleClass="nav-btn" text="Pedidos" />
+            <Button onAction="#goToInventory" styleClass="nav-btn" text="Estoque" />
+            <Button onAction="#goToReports" styleClass="nav-btn, nav-active" text="Relatórios" />
         </HBox>
     </top>
 
@@ -63,21 +63,21 @@
 
                 <VBox spacing="4" styleClass="kpi-card" HBox.hgrow="ALWAYS">
                     <padding><Insets bottom="18" left="20" right="20" top="18" /></padding>
-                    <Label styleClass="kpi-label" text="💰  Receita Total" />
+                    <Label styleClass="kpi-label" text="Receita Total" />
                     <Label fx:id="kpiRevenue" styleClass="kpi-value" text="R$ 0,00" />
                     <Label fx:id="kpiRevenueDelta" styleClass="kpi-delta-neutral" text="+0% vs período anterior" />
                 </VBox>
 
                 <VBox spacing="4" styleClass="kpi-card" HBox.hgrow="ALWAYS">
                     <padding><Insets bottom="18" left="20" right="20" top="18" /></padding>
-                    <Label styleClass="kpi-label" text="🧾  Transações" />
+                    <Label styleClass="kpi-label" text="Transações" />
                     <Label fx:id="kpiTransactions" styleClass="kpi-value" text="0" />
                     <Label fx:id="kpiAvgTicket" styleClass="kpi-sub" text="Ticket médio: R$ 0,00" />
                 </VBox>
 
                 <VBox spacing="4" styleClass="kpi-card" HBox.hgrow="ALWAYS">
                     <padding><Insets bottom="18" left="20" right="20" top="18" /></padding>
-                    <Label styleClass="kpi-label" text="⭐  Mais Vendido" />
+                    <Label styleClass="kpi-label" text="Mais Vendido" />
                     <Label fx:id="kpiBestItem" styleClass="kpi-value-sm" text="—" />
                     <Label fx:id="kpiBestQty" styleClass="kpi-sub" text="0 unidades" />
                 </VBox>
@@ -118,10 +118,10 @@
 
                     <VBox spacing="10" styleClass="chart-card">
                         <padding><Insets bottom="16" left="16" right="16" top="16" /></padding>
-                        <Label styleClass="chart-title" text="🏆  Top 3 Mais Vendidos" />
+                        <Label styleClass="chart-title" text="Top 3 Mais Vendidos" />
 
                         <HBox alignment="CENTER_LEFT" spacing="10" styleClass="top-item-row">
-                            <Label styleClass="medal" text="🥇" />
+                            <Label styleClass="medal" text="1" />
                             <VBox HBox.hgrow="ALWAYS">
                                 <Label fx:id="top1Name" styleClass="top-item-name" text="—" />
                                 <Label fx:id="top1Detail" styleClass="top-item-sub" text="0 un  •  R$ 0,00" />
@@ -130,7 +130,7 @@
                         </HBox>
 
                         <HBox alignment="CENTER_LEFT" spacing="10" styleClass="top-item-row">
-                            <Label styleClass="medal" text="🥈" />
+                            <Label styleClass="medal" text="2" />
                             <VBox HBox.hgrow="ALWAYS">
                                 <Label fx:id="top2Name" styleClass="top-item-name" text="—" />
                                 <Label fx:id="top2Detail" styleClass="top-item-sub" text="0 un  •  R$ 0,00" />
@@ -139,7 +139,7 @@
                         </HBox>
 
                         <HBox alignment="CENTER_LEFT" spacing="10" styleClass="top-item-row">
-                            <Label styleClass="medal" text="🥉" />
+                            <Label styleClass="medal" text="3" />
                             <VBox HBox.hgrow="ALWAYS">
                                 <Label fx:id="top3Name" styleClass="top-item-name" text="—" />
                                 <Label fx:id="top3Detail" styleClass="top-item-sub" text="0 un  •  R$ 0,00" />
