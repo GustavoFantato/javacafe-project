@@ -19,40 +19,21 @@ public class CheckoutService {
     public CheckoutService(InventoryService inventoryService, String filePath) {
         this.inventoryService = inventoryService;
         this.filePath = filePath;
-        loadLastTransactionId(); // Gets the last transaction ID from the sales csv
+        loadLastTransactionState(); // Gets the last transaction and order IDs from the sales csv
     }
 
     // Methods
 
     // Process the payment method to its process
     public boolean processPayment(PaymentMethods paymentMethod, Order currentOrder, double cashReceived) throws InvalidPaymentException {
-
-        double cartCost = currentOrder.getTotalCost(); // It considers the tax (-10%)
-
-        switch (paymentMethod) {
-            case CARD:
-                System.out.println("[Checkout] CARD SELECTED - Validation success");
-                return true;
-
-            case PIX:
-                System.out.println("[Checkout] PIX SELECTED - Validation success");
-                return true;
-
-            case CASH:
-                System.out.println("[Checkout] CASH SELECTED");
-                if (cashReceived < cartCost) {
-                    throw new InvalidPaymentException("ERROR: Not enough cash to finish the order");
-                }
-
-                processChange(cartCost, cashReceived);
-                return true;
-            default:
-                return false;
-        }
+        PaymentService paymentService = PaymentService.forMethod(paymentMethod);
+        paymentService.validate(currentOrder, cashReceived);
+        return true;
     }
 
     // Process, logs and saves the final sale into the CSV and decreases stock
     public void finishSale(Order currentOrder, PaymentMethods paymentMethod, double cashReceived) {
+        currentOrder.ensureOrderId();
         transactionId++; // Increments the transaction ID that will be logged
 
         java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy~HH:mm:ss");
@@ -72,7 +53,15 @@ public class CheckoutService {
                 inventoryService.decreaseProductStock(p.getID(), item.getQtd());
             }
 
+            File salesFile = new File(this.filePath);
+            boolean writeHeader = !salesFile.exists() || salesFile.length() == 0;
+
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.filePath, true))) {
+
+                if (writeHeader) {
+                    writer.write("transactionId,orderId,productId,productName,qtd,unitPrice,subtotal");
+                    writer.newLine();
+                }
 
                 for (OrderItem item : currentOrder.getItems()) {
                     Product p = item.getProduct();
@@ -112,14 +101,7 @@ public class CheckoutService {
         }
     }
 
-    // Prints, calculates and returns the change
-    private void processChange(double cartCost, double cashReceived) {
-        System.out.printf("CART TOTAL (WITH TAXES): R$%.2f\n", cartCost);
-        System.out.printf("CASH RECEIVED: R$%.2f\n", cashReceived);
-        System.out.printf("CHANGE: R$%.2f\n", calculateChange(cartCost, cashReceived));
-    }
-
-    private void loadLastTransactionId() {
+    private void loadLastTransactionState() {
         File file = new File(this.filePath);
         if (!file.exists() || file.length() == 0) {
             return;
@@ -127,29 +109,33 @@ public class CheckoutService {
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
-            String lastLine = null;
+            int lastTransactionId = 0;
+            int lastOrderId = 0;
 
             while ((line = reader.readLine()) != null) {
-                if (!line.trim().isEmpty()) {
-                    lastLine = line;
+                line = line.trim();
+                if (line.isEmpty() || line.startsWith("transactionId") || line.startsWith("footer")) {
+                    continue;
                 }
-            }
 
-            if (lastLine != null) {
-                String[] tokens = lastLine.split(",");
-
+                String[] tokens = line.split(",");
                 if (tokens[0].equals("f")) {
-                    transactionId = Integer.parseInt(tokens[1]);
-                } else {
-                    transactionId = Integer.parseInt(tokens[0]);
+                    lastTransactionId = Math.max(lastTransactionId, Integer.parseInt(tokens[1]));
+                    lastOrderId = Math.max(lastOrderId, Integer.parseInt(tokens[3]));
+                } else if (tokens.length >= 2) {
+                    lastTransactionId = Math.max(lastTransactionId, Integer.parseInt(tokens[0]));
+                    lastOrderId = Math.max(lastOrderId, Integer.parseInt(tokens[1]));
                 }
             }
+
+            transactionId = lastTransactionId;
+            Order.syncCounter(lastOrderId);
         } catch (Exception e) {
             System.err.println("[Checkout] Could not load last transaction ID. Error: " + e.getMessage());
         }
     }
 
-    private double calculateChange(double cartCost, double cashReceived) {
+    public double calculateChange(double cartCost, double cashReceived) {
         return (cashReceived - cartCost);
     }
 }

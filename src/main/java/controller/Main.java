@@ -1,32 +1,29 @@
 package controller;
 
-import exception.InvalidPaymentException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
-import model.Order;
-import model.OrderItem;
-import model.Product;
-import model.enums.Category;
 import service.CheckoutService;
 import service.InventoryService;
-import service.enums.PaymentMethods;
+import service.ReportsService;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Locale;
-
-import static model.enums.Size.*;
 
 public class Main extends Application {
 
     private static InventoryService inventoryService;
     private static CheckoutService checkoutService;
+    private static ReportsService reportsService;
     private static Stage primaryStage;
     private static final String STORAGE_PATH = "./data/storage.csv";
     private static final String SALES_PATH = "./data/sales.csv";
+    private static final double WINDOW_WIDTH = 1280;
+    private static final double WINDOW_HEIGHT = 1000;
 
     @Override
     public void start(Stage stage) {
@@ -42,6 +39,10 @@ public class Main extends Application {
             changeScene("/fxml/order_entry.fxml");
 
             primaryStage.setTitle("Java Café POS");
+            URL iconUrl = Main.class.getResource("/images/app-icon.png");
+            if (iconUrl != null) {
+                primaryStage.getIcons().setAll(new javafx.scene.image.Image(iconUrl.toExternalForm()));
+            }
             primaryStage.setResizable(false);
             primaryStage.show();
 
@@ -66,12 +67,12 @@ public class Main extends Application {
             } else if (controller instanceof InventoryController) {
                 ((InventoryController) controller).setService(inventoryService);
             } else if (controller instanceof ReportsController) {
-                ((ReportsController) controller).setSalesFilePath(SALES_PATH);
+                ((ReportsController) controller).setReportsService(reportsService);
             }
 
             // Se for a primeira inicialização
             if (primaryStage.getScene() == null) {
-                Scene scene = new Scene(root, 1100, 700);
+                Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
                 // Vincula o arquivo de estilo higienizado de forma segura
                 scene.getStylesheets().add(Main.class.getResource("/css/style.css").toExternalForm());
                 primaryStage.setScene(scene);
@@ -89,29 +90,14 @@ public class Main extends Application {
         // Evita quebras de parseamento decimal no CSV (força ponto ao invés de vírgula)
         Locale.setDefault(Locale.US);
 
-        System.out.println("=== ☕ INICIANDO INFRAESTRUTURA DO JAVA CAFÉ ===");
+        System.out.println("=== INICIANDO INFRAESTRUTURA DO JAVA CAFE ===");
 
         // Inicialização dos serviços globais
         inventoryService = new InventoryService(STORAGE_PATH);
         checkoutService = new CheckoutService(inventoryService, SALES_PATH);
+        reportsService = new ReportsService(SALES_PATH);
 
-        // Alimenta dados iniciais caso o estoque esteja completamente zerado
-        if (inventoryService.getStorageList().isEmpty()) {
-            System.out.println("[Menu] Estoque vazio detectado! Gerando itens iniciais de teste...");
-
-            Product cafeM = new Product(1, "Cappuccino Italiano", 8.50, 50, "cappuccino.png", M, Category.BEVERAGE, "Café espresso com leite vaporizado e canela.");
-            Product cafeP = new Product(2, "Espresso Simples", 4.50, 4, "espresso.png", P, Category.BEVERAGE, "Café espresso curto e encorpado (Estoque Baixo).");
-            Product bolo = new Product(3, "Bolo de Cenoura", 7.00, 15, "bolo.png", G, Category.FOOD, "Fatia de bolo artesanal com calda de chocolate.");
-
-            inventoryService.addProductStorage(cafeM);
-            inventoryService.addProductStorage(cafeP);
-            inventoryService.addProductStorage(bolo);
-        }
-
-        // ⚠️ REMOVIDO: O bloco antigo de simulação de venda foi retirado daqui
-        // para impedir a gravação fantasma/duplicada no banco CSV ao iniciar o app.
-
-        System.out.println("\n=== 🖥️ ABRINDO INTERFACE GRÁFICA JAVAFX ===");
+        System.out.println("\n=== ABRINDO INTERFACE GRAFICA JAVAFX ===");
         launch(args);
     }
 }

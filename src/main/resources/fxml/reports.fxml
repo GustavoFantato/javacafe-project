@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.BarChart?>
 <?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
@@ -13,20 +14,21 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="700" prefWidth="1100" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ReportsController">
+<BorderPane prefHeight="820" prefWidth="1280" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ReportsController">
 
     <top>
         <HBox alignment="CENTER_LEFT" spacing="16" styleClass="top-bar">
             <padding><Insets bottom="12" left="20" right="20" top="12" /></padding>
 
-            <Label styleClass="app-title" text="☕  Java Café" />
+            <Label styleClass="app-title" text="Java Café" />
             <Region HBox.hgrow="ALWAYS" />
 
-            <Button onAction="#goToOrders" styleClass="nav-btn" text="📋  Pedidos" />
-            <Button onAction="#goToInventory" styleClass="nav-btn" text="📦  Estoque" />
-            <Button onAction="#goToReports" styleClass="nav-btn, nav-active" text="📊  Relatórios" />
+            <Button onAction="#goToOrders" styleClass="nav-btn" text="Pedidos" />
+            <Button onAction="#goToInventory" styleClass="nav-btn" text="Estoque" />
+            <Button onAction="#goToReports" styleClass="nav-btn, nav-active" text="Relatórios" />
         </HBox>
     </top>
 
@@ -61,21 +63,21 @@
 
                 <VBox spacing="4" styleClass="kpi-card" HBox.hgrow="ALWAYS">
                     <padding><Insets bottom="18" left="20" right="20" top="18" /></padding>
-                    <Label styleClass="kpi-label" text="💰  Receita Total" />
+                    <Label styleClass="kpi-label" text="Receita Total" />
                     <Label fx:id="kpiRevenue" styleClass="kpi-value" text="R$ 0,00" />
                     <Label fx:id="kpiRevenueDelta" styleClass="kpi-delta-neutral" text="+0% vs período anterior" />
                 </VBox>
 
                 <VBox spacing="4" styleClass="kpi-card" HBox.hgrow="ALWAYS">
                     <padding><Insets bottom="18" left="20" right="20" top="18" /></padding>
-                    <Label styleClass="kpi-label" text="🧾  Transações" />
+                    <Label styleClass="kpi-label" text="Transações" />
                     <Label fx:id="kpiTransactions" styleClass="kpi-value" text="0" />
                     <Label fx:id="kpiAvgTicket" styleClass="kpi-sub" text="Ticket médio: R$ 0,00" />
                 </VBox>
 
                 <VBox spacing="4" styleClass="kpi-card" HBox.hgrow="ALWAYS">
                     <padding><Insets bottom="18" left="20" right="20" top="18" /></padding>
-                    <Label styleClass="kpi-label" text="⭐  Mais Vendido" />
+                    <Label styleClass="kpi-label" text="Mais Vendido" />
                     <Label fx:id="kpiBestItem" styleClass="kpi-value-sm" text="—" />
                     <Label fx:id="kpiBestQty" styleClass="kpi-sub" text="0 unidades" />
                 </VBox>
@@ -86,25 +88,40 @@
 
                 <VBox spacing="10" styleClass="chart-card" HBox.hgrow="ALWAYS">
                     <padding><Insets bottom="16" left="16" right="16" top="16" /></padding>
-                    <Label styleClass="chart-title" text="Receita por Período" />
-                    <BarChart fx:id="revenueChart" animated="false" legendVisible="false" styleClass="report-chart" VBox.vgrow="ALWAYS">
-                        <xAxis>
-                            <CategoryAxis fx:id="revenueXAxis" label="" />
-                        </xAxis>
-                        <yAxis>
-                            <NumberAxis fx:id="revenueYAxis" label="R$" />
-                        </yAxis>
-                    </BarChart>
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <Label styleClass="chart-title" text="Receita por Período" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <ToggleButton fx:id="chartBarsToggle" onAction="#showBarChart" selected="true" styleClass="chart-toggle-btn" text="Barras" />
+                        <ToggleButton fx:id="chartLinesToggle" onAction="#showLineChart" styleClass="chart-toggle-btn" text="Linhas" />
+                    </HBox>
+                    <StackPane minHeight="320" VBox.vgrow="ALWAYS">
+                        <BarChart fx:id="revenueChart" animated="false" barGap="3" categoryGap="12" legendVisible="false" minHeight="300" styleClass="report-chart" VBox.vgrow="ALWAYS">
+                            <xAxis>
+                                <CategoryAxis fx:id="revenueXAxis" label="" />
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis fx:id="revenueYAxis" label="R$" />
+                            </yAxis>
+                        </BarChart>
+                        <LineChart fx:id="revenueLineChart" animated="false" createSymbols="true" legendVisible="false" minHeight="300" styleClass="report-chart" visible="false" managed="false">
+                            <xAxis>
+                                <CategoryAxis label="" />
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis label="R$" />
+                            </yAxis>
+                        </LineChart>
+                    </StackPane>
                 </VBox>
 
                 <VBox prefWidth="360" spacing="16">
 
                     <VBox spacing="10" styleClass="chart-card">
                         <padding><Insets bottom="16" left="16" right="16" top="16" /></padding>
-                        <Label styleClass="chart-title" text="🏆  Top 3 Mais Vendidos" />
+                        <Label styleClass="chart-title" text="Top 3 Mais Vendidos" />
 
                         <HBox alignment="CENTER_LEFT" spacing="10" styleClass="top-item-row">
-                            <Label styleClass="medal" text="🥇" />
+                            <Label styleClass="medal" text="1" />
                             <VBox HBox.hgrow="ALWAYS">
                                 <Label fx:id="top1Name" styleClass="top-item-name" text="—" />
                                 <Label fx:id="top1Detail" styleClass="top-item-sub" text="0 un  •  R$ 0,00" />
@@ -113,7 +130,7 @@
                         </HBox>
 
                         <HBox alignment="CENTER_LEFT" spacing="10" styleClass="top-item-row">
-                            <Label styleClass="medal" text="🥈" />
+                            <Label styleClass="medal" text="2" />
                             <VBox HBox.hgrow="ALWAYS">
                                 <Label fx:id="top2Name" styleClass="top-item-name" text="—" />
                                 <Label fx:id="top2Detail" styleClass="top-item-sub" text="0 un  •  R$ 0,00" />
@@ -122,7 +139,7 @@
                         </HBox>
 
                         <HBox alignment="CENTER_LEFT" spacing="10" styleClass="top-item-row">
-                            <Label styleClass="medal" text="🥉" />
+                            <Label styleClass="medal" text="3" />
                             <VBox HBox.hgrow="ALWAYS">
                                 <Label fx:id="top3Name" styleClass="top-item-name" text="—" />
                                 <Label fx:id="top3Detail" styleClass="top-item-sub" text="0 un  •  R$ 0,00" />
@@ -132,14 +149,7 @@
 
                         <Separator />
                         <Label styleClass="chart-title-sm" text="Formas de Pagamento mais utilizadas" />
-                        <PieChart fx:id="paymentPieChart" animated="false" labelsVisible="true" prefHeight="130" styleClass="payment-pie" />
-                    </VBox>
-
-                    <VBox spacing="10" styleClass="chart-card" VBox.vgrow="ALWAYS">
-                        <padding><Insets bottom="16" left="16" right="16" top="16" /></padding>
-                        <HBox alignment="CENTER_LEFT">
-                            <Region HBox.hgrow="ALWAYS" />
-                        </HBox>
+                        <PieChart fx:id="paymentPieChart" animated="false" labelsVisible="false" legendVisible="true" maxHeight="200" minHeight="160" prefHeight="180" styleClass="payment-pie" />
                     </VBox>
 
                 </VBox>

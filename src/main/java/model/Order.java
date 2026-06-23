@@ -7,14 +7,15 @@ import java.util.List;
 public class Order {
 
     // Attributes
-    private List<OrderItem> items; // Dynamic list
-    private final int orderID;
+    private List<OrderItem> items;
+    private int orderID;
     private static int idCount = 0;
     private Status status;
+    private String customerName;
 
     // Constructor
     public Order() {
-        this.orderID = ++idCount;
+        this.orderID = 0;
         this.items = new ArrayList<>(); // Creates order's item list
         this.status = Status.PENDING;
     }
@@ -56,7 +57,7 @@ public class Order {
 
     // Getters
     public int getOrderID() {
-        return orderID;
+        return orderID > 0 ? orderID : peekNextOrderId();
     }
     public Status getStatus() {
         return status;
@@ -65,9 +66,30 @@ public class Order {
         return items;
     }
 
-    // Setters
+    public String getCustomerName() {
+        return customerName;
+    }
+
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public void ensureOrderId() {
+        if (orderID <= 0) {
+            orderID = ++idCount;
+        }
+    }
+
+    public static int peekNextOrderId() {
+        return idCount + 1;
+    }
+
+    public static void syncCounter(int lastUsedId) {
+        idCount = Math.max(idCount, lastUsedId);
     }
 
     @Override

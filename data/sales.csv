@@ -1,4 +1,40 @@
-transactionId,orderId,productId,productName,qtd,unitPrice,subTotal
+transactionId,orderId,productId,productName,qtd,unitPrice,subtotal
 footer,transactionId,timeStamp,orderId,paymentMethod,cartCost,change
-
-f,0,null,-1,null,-1,-1
+1,1,4,Espresso Duplo,1,5.00,5.00
+f,1,02-06-2026~08:15:00,1,CASH,5.50,4.50
+2,2,2,Cappuccino Cremoso - M,2,8.50,17.00
+2,2,8,Pao de Queijo Recheado,1,7.50,7.50
+f,2,05-06-2026~10:20:00,2,PIX,26.95,0.00
+3,3,7,Croissant de Presunto,1,11.00,11.00
+3,3,5,Latte Baunilha,1,9.50,9.50
+f,3,10-06-2026~14:05:00,3,CARD,22.55,0.00
+4,4,11,Brownie com Nozes,2,9.00,18.00
+4,4,13,Cookie Triplo Chocolate,1,6.00,6.00
+f,4,14-06-2026~16:40:00,4,CASH,26.40,3.60
+5,5,9,Sanduiche Natural,1,13.50,13.50
+5,5,4,Espresso Duplo,2,5.00,10.00
+f,5,18-06-2026~09:10:00,5,PIX,25.85,0.00
+6,6,12,Cheesecake de Frutas Vermelhas,1,14.00,14.00
+6,6,6,Mocha Gelado,1,12.00,12.00
+f,6,20-06-2026~11:50:00,6,CARD,28.60,0.00
+7,7,4,Espresso Duplo,2,5.00,10.00
+f,7,22-06-2026~08:10:00,7,CASH,11.00,9.00
+8,8,1,Cappuccino Cremoso - P,1,6.50,6.50
+8,8,8,Pao de Queijo Recheado,2,7.50,15.00
+f,8,22-06-2026~10:35:00,8,PIX,23.65,0.00
+9,9,7,Croissant de Presunto,1,11.00,11.00
+9,9,5,Latte Baunilha,1,9.50,9.50
+9,9,13,Cookie Triplo Chocolate,1,6.00,6.00
+f,9,22-06-2026~12:20:00,9,CARD,29.15,0.00
+10,10,11,Brownie com Nozes,1,9.00,9.00
+10,10,12,Cheesecake de Frutas Vermelhas,1,14.00,14.00
+f,10,22-06-2026~15:05:00,10,PIX,25.30,0.00
+11,11,6,Mocha Gelado,2,12.00,24.00
+f,11,22-06-2026~18:40:00,11,CASH,26.40,3.60
+12,12,3,Cappuccino Cremoso - G,1,10.50,10.50
+12,12,9,Sanduiche Natural,1,13.50,13.50
+12,12,14,Bolo de Cenoura com Calda,1,8.50,8.50
+f,12,22-06-2026~20:15:00,12,PIX,35.75,0.00
+13,13,2,Cappuccino Cremoso - M,2,8.50,17.00
+13,13,10,Torta Integral de Frango,1,12.50,12.50
+f,13,22-06-2026~21:30:00,13,CARD,32.45,0.00
