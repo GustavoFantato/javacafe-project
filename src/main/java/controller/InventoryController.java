@@ -15,10 +15,12 @@ import model.enums.Category;
 import model.enums.Size;
 import service.InventoryService;
 import util.ProductImageResolver;
+import util.ProductImageStorage;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
@@ -270,23 +272,28 @@ public class InventoryController {
         try {
             double price = Double.parseDouble(editPriceField.getText().replace(",", "."));
             int threshold = editThresholdSpinner.getValue();
+            String imagePath = resolveEditedImagePath();
 
             Product updated = new Product(
                     selectedProduct.getID(),
                     editNameField.getText().trim(),
                     price,
                     selectedProduct.getStockQtd(),
-                    getEditedImagePath(),
+                    imagePath,
                     selectedProduct.getSize(),
                     selectedProduct.getCategory(),
                     selectedProduct.getDescription(),
                     threshold);
 
             inventoryService.updateProductStorage(updated);
+            editImageField.setText(imagePath);
+            refreshImagePreview(imagePath);
             formStatusLabel.setText("✅ Alterações salvas!");
             refreshTableAndMetrics();
         } catch (NumberFormatException e) {
             formStatusLabel.setText("Erro: Preço inválido!");
+        } catch (IOException e) {
+            formStatusLabel.setText("Erro: " + e.getMessage());
         }
     }
 
@@ -408,12 +415,21 @@ public class InventoryController {
         clockLabel.setText(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
     }
 
-    private String getEditedImagePath() {
+    private String resolveEditedImagePath() throws IOException {
         String imagePath = editImageField.getText();
         if (imagePath == null || imagePath.isBlank()) {
             return ProductImageResolver.defaultImagePath();
         }
-        return imagePath.trim();
+
+        String normalizedPath = imagePath.trim();
+        if (ProductImageStorage.isInternalPath(normalizedPath)) {
+            return normalizedPath.startsWith("/") ? normalizedPath.substring(1) : normalizedPath;
+        }
+
+        return ProductImageStorage.importProductImage(
+                ProductImageStorage.resolveSourcePath(normalizedPath),
+                selectedProduct.getID(),
+                editNameField.getText().trim());
     }
 
     private void refreshImagePreview(String imagePath) {

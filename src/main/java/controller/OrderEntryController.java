@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
@@ -404,6 +405,11 @@ public class OrderEntryController {
         imageView.setCache(true);
         imageView.getStyleClass().add("menu-item-image");
 
+        HBox imageRow = new HBox(imageView);
+        imageRow.setAlignment(Pos.CENTER);
+        imageRow.setMaxWidth(Double.MAX_VALUE);
+        imageRow.getStyleClass().add("menu-item-image-wrap");
+
         Label nameLabel = new Label(product.getName());
         nameLabel.getStyleClass().add("menu-item-name");
         nameLabel.setWrapText(true);
@@ -427,7 +433,7 @@ public class OrderEntryController {
         addBtn.setDisable(product.getStockQtd() <= 0);
         addBtn.setOnAction(e -> addProductToOrder(product));
 
-        card.getChildren().addAll(imageView, nameLabel, descriptionLabel, priceLabel, stockLabel, addBtn);
+        card.getChildren().addAll(imageRow, nameLabel, descriptionLabel, priceLabel, stockLabel, addBtn);
         return card;
     }
 

@@ -26,29 +26,9 @@ public class CheckoutService {
 
     // Process the payment method to its process
     public boolean processPayment(PaymentMethods paymentMethod, Order currentOrder, double cashReceived) throws InvalidPaymentException {
-
-        double cartCost = currentOrder.getTotalCost(); // It considers the tax (-10%)
-
-        switch (paymentMethod) {
-            case CARD:
-                System.out.println("[Checkout] CARD SELECTED - Validation success");
-                return true;
-
-            case PIX:
-                System.out.println("[Checkout] PIX SELECTED - Validation success");
-                return true;
-
-            case CASH:
-                System.out.println("[Checkout] CASH SELECTED");
-                if (cashReceived < cartCost) {
-                    throw new InvalidPaymentException("Valor recebido insuficiente para finalizar o pedido.");
-                }
-
-                processChange(cartCost, cashReceived);
-                return true;
-            default:
-                return false;
-        }
+        PaymentService paymentService = PaymentService.forMethod(paymentMethod);
+        paymentService.validate(currentOrder, cashReceived);
+        return true;
     }
 
     // Process, logs and saves the final sale into the CSV and decreases stock
@@ -119,13 +99,6 @@ public class CheckoutService {
         } catch (Exception e) {
             System.err.println("ERROR during finishSale: " + e.getMessage());
         }
-    }
-
-    // Prints, calculates and returns the change
-    private void processChange(double cartCost, double cashReceived) {
-        System.out.printf("CART TOTAL (WITH TAXES): R$%.2f\n", cartCost);
-        System.out.printf("CASH RECEIVED: R$%.2f\n", cashReceived);
-        System.out.printf("CHANGE: R$%.2f\n", calculateChange(cartCost, cashReceived));
     }
 
     private void loadLastTransactionState() {
