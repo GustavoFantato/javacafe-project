@@ -20,6 +20,7 @@ import java.util.Map;
 /**
  * Service responsible for parsing sales data and generating business intelligence reports.
  */
+// Main class for reportsservice related behavior
 public class ReportsService {
 
     private static final DateTimeFormatter FOOTER_DATE =
@@ -35,6 +36,7 @@ public class ReportsService {
 
     private final String filePath;
 
+    // Handles ReportsService logic
     public ReportsService(String filePath) {
         this.filePath = filePath;
     }
@@ -46,6 +48,7 @@ public class ReportsService {
      * @param grouping The granularity of the revenue data (Hourly, Daily, Weekly).
      * @return A SalesReport object containing the aggregated metrics.
      */
+    // Handles generateReport logic
     public SalesReport generateReport(LocalDate start, LocalDate end, RevenueGrouping grouping) {
         SalesReport report = new SalesReport();
         report.setTop3(new TopItem[3]);
@@ -128,6 +131,7 @@ public class ReportsService {
         return report;
     }
 
+    // Handles buildTop3 logic
     private TopItem[] buildTop3(Map<String, Integer> itemQuantities, Map<String, Double> itemRevenues) {
         List<Map.Entry<String, Integer>> sorted = new ArrayList<>(itemQuantities.entrySet());
         sorted.sort(Comparator.comparingInt(Map.Entry<String, Integer>::getValue).reversed());
@@ -178,6 +182,7 @@ public class ReportsService {
         return filled;
     }
 
+    // Handles formatRevenueKey logic
     private String formatRevenueKey(LocalDateTime timestamp, RevenueGrouping grouping) {
         return switch (grouping) {
             case HOURLY -> String.format("%02dh", timestamp.getHour());
@@ -186,6 +191,7 @@ public class ReportsService {
         };
     }
 
+    // Handles formatWeekdayKey logic
     private String formatWeekdayKey(LocalDate date) {
         return switch (date.getDayOfWeek()) {
             case MONDAY -> "Seg";
@@ -198,6 +204,7 @@ public class ReportsService {
         };
     }
 
+    // Handles parseFooterTimestamp logic
     private LocalDateTime parseFooterTimestamp(String timestampField) {
         try {
             return LocalDateTime.parse(timestampField, FOOTER_TIMESTAMP);
@@ -206,6 +213,7 @@ public class ReportsService {
         }
     }
 
+    // Handles formatCurrency logic
     public String formatCurrency(double value) {
         return String.format(Locale.forLanguageTag("pt-BR"), "R$ %.2f", value);
     }

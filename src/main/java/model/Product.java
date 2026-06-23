@@ -7,6 +7,7 @@ import model.enums.Size;
 /**
  * Represents a sellable item inside the catalog and inventory system.
  */
+// Main class for product related behavior
 public class Product {
     public static final int DEFAULT_LOW_STOCK = 5;
 
@@ -56,6 +57,7 @@ public class Product {
      * Adds units to the product's available stock.
      * * @param qtd Amount to be added. Must be greater than zero.
      */
+    // Handles increaseStock logic
     public void increaseStock(int qtd) {
         if (qtd > 0) {
             this.stockQtd += qtd;
@@ -64,74 +66,92 @@ public class Product {
         }
     }
 
+    // Handles isLowStock logic
     public boolean isLowStock() {
         return stockQtd <= lowStockThreshold;
     }
 
+    // Handles getStockQtd logic
     public int getStockQtd() {
         return stockQtd;
     }
 
+    // Handles getLowStockThreshold logic
     public int getLowStockThreshold() {
         return lowStockThreshold;
     }
 
+    // Handles getName logic
     public String getName() {
         return name;
     }
 
+    // Handles getPrice logic
     public double getPrice() {
         return price;
     }
 
+    // Handles getImagePath logic
     public String getImagePath() {
         return imagePath;
     }
 
+    // Handles getSize logic
     public Size getSize() {
         return size;
     }
 
+    // Handles getCategory logic
     public Category getCategory() {
         return category;
     }
 
+    // Handles getDescription logic
     public String getDescription() {
         return description;
     }
 
+    // Handles getID logic
     public int getID() {
         return ID;
     }
 
+    // Handles setStockQtd logic
     public void setStockQtd(int stockQtd) {
         this.stockQtd = stockQtd;
     }
 
+    // Handles setLowStockThreshold logic
     public void setLowStockThreshold(int lowStockThreshold) {
         this.lowStockThreshold = lowStockThreshold;
     }
 
+    // Handles setPrice logic
     public void setPrice(double price) {
         this.price = price;
     }
 
+    // Handles setName logic
     public void setName(String name) {
         this.name = name;
     }
 
+    // Handles setImagePath logic
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
     }
 
+    // Handles setSize logic
     public void setSize(Size size) {
         this.size = size;
     }
 
+    // Handles setCategory logic
     public void setCategory(Category category) {
         this.category = category;
     }
 
+    // Handles setDescription logic
     public void setDescription(String description) {
         this.description = description;
     }

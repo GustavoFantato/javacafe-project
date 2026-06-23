@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+// Main class for inventorycontroller related behavior
 public class InventoryController {
 
     @FXML private TextField inventorySearchField;
@@ -73,6 +74,7 @@ public class InventoryController {
     private final ToggleGroup formTabs = new ToggleGroup();
 
     @FXML
+    // Handles initialize logic
     public void initialize() {
         productObservableList = FXCollections.observableArrayList();
         inventoryTable.setItems(productObservableList);
@@ -126,11 +128,13 @@ public class InventoryController {
         updateClock();
     }
 
+    // Handles setService logic
     public void setService(InventoryService inventoryService) {
         this.inventoryService = inventoryService;
         refreshTableAndMetrics();
     }
 
+    // Handles refreshTableAndMetrics logic
     private void refreshTableAndMetrics() {
         if (inventoryService == null) {
             return;
@@ -161,15 +165,18 @@ public class InventoryController {
     }
 
     @FXML
+    // Handles onSearch logic
     private void onSearch() {
         refreshTableAndMetrics();
     }
 
     @FXML
+    // Handles onCategoryFilter logic
     private void onCategoryFilter() {
         refreshTableAndMetrics();
     }
 
+    // Handles applyFilters logic
     private void applyFilters() {
         List<Product> products = new ArrayList<>(inventoryService.getStorageList());
 
@@ -187,6 +194,7 @@ public class InventoryController {
     }
 
     @FXML
+    // Handles switchToAdd logic
     private void switchToAdd() {
         addProductPane.setVisible(true);
         addProductPane.setManaged(true);
@@ -197,6 +205,7 @@ public class InventoryController {
     }
 
     @FXML
+    // Handles switchToEdit logic
     private void switchToEdit() {
         editProductPane.setVisible(true);
         editProductPane.setManaged(true);
@@ -207,6 +216,7 @@ public class InventoryController {
     }
 
     @FXML
+    // Handles addProduct logic
     private void addProduct() {
         String name = newNameField.getText();
         String categoryLabel = newCategoryCombo.getSelectionModel().getSelectedItem();
@@ -241,6 +251,7 @@ public class InventoryController {
     }
 
     @FXML
+    // Handles clearAddForm logic
     private void clearAddForm() {
         newNameField.clear();
         newCategoryCombo.getSelectionModel().clearSelection();
@@ -250,6 +261,7 @@ public class InventoryController {
         newDescField.clear();
     }
 
+    // Handles loadProductIntoEditForm logic
     private void loadProductIntoEditForm(Product product) {
         selectedProductLabel.setText(product.getName());
         editNameField.setText(product.getName());
@@ -261,6 +273,7 @@ public class InventoryController {
     }
 
     @FXML
+    // Handles saveEdits logic
     private void saveEdits() {
         if (selectedProduct == null) {
             formStatusLabel.setText("Selecione um produto na tabela.");
@@ -296,6 +309,7 @@ public class InventoryController {
     }
 
     @FXML
+    // Handles restockProduct logic
     private void restockProduct() {
         if (selectedProduct == null) {
             formStatusLabel.setText("Selecione um produto na tabela.");
@@ -314,6 +328,7 @@ public class InventoryController {
     }
 
     @FXML
+    // Handles removeProduct logic
     private void removeProduct() {
         if (selectedProduct == null) {
             formStatusLabel.setText("Selecione um produto na tabela.");
@@ -338,6 +353,7 @@ public class InventoryController {
     }
 
     @FXML
+    // Handles scrollToLowStock logic
     private void scrollToLowStock() {
         for (Product p : productObservableList) {
             if (p.isLowStock()) {
@@ -350,6 +366,7 @@ public class InventoryController {
     }
 
     @FXML
+    // Handles exportCSV logic
     private void exportCSV() {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Salvar backup do estoque");
@@ -375,6 +392,7 @@ public class InventoryController {
     }
 
     @FXML
+    // Handles browseEditImage logic
     private void browseEditImage() {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Selecionar imagem do produto");
@@ -391,6 +409,7 @@ public class InventoryController {
         formStatusLabel.setText("Imagem selecionada para o produto.");
     }
 
+    // Handles mapPtToCategoryEnum logic
     private Category mapPtToCategoryEnum(String label) {
         return switch (label) {
             case "Bebidas" -> Category.BEVERAGE;
@@ -400,6 +419,7 @@ public class InventoryController {
         };
     }
 
+    // Handles translateCategoryToPt logic
     private String translateCategoryToPt(Category category) {
         return switch (category) {
             case BEVERAGE -> "Bebidas";
@@ -409,6 +429,7 @@ public class InventoryController {
         };
     }
 
+    // Handles updateClock logic
     private void updateClock() {
         clockLabel.setText(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
     }
@@ -430,21 +451,24 @@ public class InventoryController {
                 editNameField.getText().trim());
     }
 
+    // Handles refreshImagePreview logic
     private void refreshImagePreview(String imagePath) {
         editImagePreview.setImage(ProductImageResolver.load(imagePath, 220, 140));
     }
 
     @FXML
+    // Handles goToOrders logic
     private void goToOrders() {
         Main.changeScene("/fxml/order_entry.fxml");
     }
 
     @FXML
+    // Handles goToInventory logic
     private void goToInventory() {
-        // já nesta tela
     }
 
     @FXML
+    // Handles goToReports logic
     private void goToReports() {
         Main.changeScene("/fxml/reports.fxml");
     }

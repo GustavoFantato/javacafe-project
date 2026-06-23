@@ -23,6 +23,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.Locale;
 import java.util.Map;
 
+// Main class for reportscontroller related behavior
 public class ReportsController {
 
     @FXML private ToggleButton btnToday;
@@ -63,6 +64,7 @@ public class ReportsController {
     private final DateTimeFormatter displayDateFmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @FXML
+    // Handles initialize logic
     public void initialize() {
         btnToday.setToggleGroup(periodGroup);
         btnWeek.setToggleGroup(periodGroup);
@@ -85,17 +87,20 @@ public class ReportsController {
         setChartType(false);
     }
 
+    // Handles setReportsService logic
     public void setReportsService(ReportsService reportsService) {
         this.reportsService = reportsService;
         loadToday();
     }
 
+    // Handles setSalesFilePath logic
     public void setSalesFilePath(String salesFilePath) {
         this.reportsService = new ReportsService(salesFilePath);
         loadToday();
     }
 
     @FXML
+    // Handles refreshReport logic
     public void refreshReport() {
         if (currentStart != null && currentEnd != null) {
             processSalesData(currentStart, currentEnd);
@@ -105,6 +110,7 @@ public class ReportsController {
     }
 
     @FXML
+    // Handles loadToday logic
     private void loadToday() {
         selectPeriod(btnToday);
         currentStart = LocalDate.now();
@@ -115,6 +121,7 @@ public class ReportsController {
     }
 
     @FXML
+    // Handles loadWeek logic
     private void loadWeek() {
         selectPeriod(btnWeek);
         currentStart = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
@@ -126,6 +133,7 @@ public class ReportsController {
     }
 
     @FXML
+    // Handles loadMonth logic
     private void loadMonth() {
         selectPeriod(btnMonth);
         currentStart = LocalDate.now().withDayOfMonth(1);
@@ -137,6 +145,7 @@ public class ReportsController {
     }
 
     @FXML
+    // Handles applyCustomDate logic
     private void applyCustomDate() {
         LocalDate start = startDatePicker.getValue();
         LocalDate end = endDatePicker.getValue();
@@ -161,6 +170,7 @@ public class ReportsController {
         processSalesData(start, end);
     }
 
+    // Handles selectPeriod logic
     private void selectPeriod(ToggleButton selected) {
         btnToday.getStyleClass().remove("period-active");
         btnWeek.getStyleClass().remove("period-active");
@@ -168,6 +178,7 @@ public class ReportsController {
         selected.getStyleClass().add("period-active");
     }
 
+    // Handles processSalesData logic
     private void processSalesData(LocalDate start, LocalDate end) {
         if (reportsService == null) {
             clearKPIs();
@@ -181,6 +192,7 @@ public class ReportsController {
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
     }
 
+    // Handles updateKPIUi logic
     private void updateKPIUi(SalesReport report) {
         kpiRevenue.setText(reportsService.formatCurrency(report.getTotalRevenue()));
         kpiTransactions.setText(String.valueOf(report.getTransactionCount()));
@@ -203,6 +215,7 @@ public class ReportsController {
         updateTop3(report.getTop3());
     }
 
+    // Handles updateTop3 logic
     private void updateTop3(TopItem[] top3) {
         Label[] names = {top1Name, top2Name, top3Name};
         Label[] details = {top1Detail, top2Detail, top3Detail};
@@ -219,6 +232,7 @@ public class ReportsController {
         }
     }
 
+    // Handles updateChartsUi logic
     private void updateChartsUi(SalesReport report) {
         revenueChart.getData().clear();
         revenueLineChart.getData().clear();
@@ -236,6 +250,7 @@ public class ReportsController {
         }
     }
 
+    // Handles clearKPIs logic
     private void clearKPIs() {
         kpiRevenue.setText("R$ 0,00");
         kpiTransactions.setText("0");
@@ -249,19 +264,23 @@ public class ReportsController {
     }
 
     @FXML
+    // Handles showBarChart logic
     private void showBarChart() {
         setChartType(false);
     }
 
     @FXML
+    // Handles showLineChart logic
     private void showLineChart() {
         setChartType(true);
     }
 
+    // Handles clearTop3 logic
     private void clearTop3() {
         updateTop3(new TopItem[0]);
     }
 
+    // Handles translatePayment logic
     private String translatePayment(String method) {
         try {
             return switch (PaymentMethods.valueOf(method)) {
@@ -274,6 +293,7 @@ public class ReportsController {
         }
     }
 
+    // Handles setChartType logic
     private void setChartType(boolean lineChartVisible) {
         revenueChart.setVisible(!lineChartVisible);
         revenueChart.setManaged(!lineChartVisible);
@@ -281,6 +301,7 @@ public class ReportsController {
         revenueLineChart.setManaged(lineChartVisible);
     }
 
+    // Handles copySeries logic
     private XYChart.Series<String, Number> copySeries(XYChart.Series<String, Number> original) {
         XYChart.Series<String, Number> copy = new XYChart.Series<>();
         for (XYChart.Data<String, Number> data : original.getData()) {
@@ -290,17 +311,19 @@ public class ReportsController {
     }
 
     @FXML
+    // Handles goToOrders logic
     private void goToOrders() {
         Main.changeScene("/fxml/order_entry.fxml");
     }
 
     @FXML
+    // Handles goToInventory logic
     private void goToInventory() {
         Main.changeScene("/fxml/inventory.fxml");
     }
 
     @FXML
+    // Handles goToReports logic
     private void goToReports() {
-        // já nesta tela
     }
 }

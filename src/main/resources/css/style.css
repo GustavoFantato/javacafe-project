@@ -2,15 +2,15 @@
    JAVA CAFE - GLOBAL & PALETTE CONSTANTS
    ═════════════════════════════════════════════════════════════════════ */
 .root {
-    -fx-primary-color: #5D4037;       /* Marrom Café Escuro */
-    -fx-secondary-color: #8D6E63;     /* Marrom Café com Leite */
-    -fx-accent-color: #2E7D32;        /* Verde Sucesso / Confirmação */
-    -fx-danger-color: #C62828;        /* Vermelho Alerta / Remoção */
-    -fx-text-main: #3E2723;           /* Texto principal marrom escuro */
-    -fx-text-muted: #757575;          /* Texto secundário cinza */
-    -fx-border-color: #EFEBE9;        /* Divisórias suaves */
+    -fx-primary-color: #5D4037;
+    -fx-secondary-color: #8D6E63;
+    -fx-accent-color: #2E7D32;
+    -fx-danger-color: #C62828;
+    -fx-text-main: #3E2723;
+    -fx-text-muted: #757575;
+    -fx-border-color: #EFEBE9;
 
-    /* Valores fixos literais evitam que o analisador do JavaFX quebre em loops */
+
     -fx-background-color: #FDFBF7;
     -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
     -fx-font-size: 14px;

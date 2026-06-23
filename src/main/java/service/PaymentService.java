@@ -20,6 +20,7 @@ public interface PaymentService {
 class CardPaymentService implements PaymentService {
 
     @Override
+    // Handles validate logic
     public void validate(Order order, double cashReceived) {
         System.out.println("[Checkout] CARD SELECTED - Validation success");
     }
@@ -28,6 +29,7 @@ class CardPaymentService implements PaymentService {
 class PixPaymentService implements PaymentService {
 
     @Override
+    // Handles validate logic
     public void validate(Order order, double cashReceived) {
         System.out.println("[Checkout] PIX SELECTED - Validation success");
     }

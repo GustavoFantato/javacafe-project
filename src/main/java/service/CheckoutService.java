@@ -11,16 +11,18 @@ import java.time.LocalDateTime;
 /**
  * Handles payment validations, checkout processing, and sales logging.
  */
+// Main class for checkoutservice related behavior
 public class CheckoutService {
 
     private InventoryService inventoryService;
     private String filePath;
     private static int transactionId = 0;
 
+    // Handles CheckoutService logic
     public CheckoutService(InventoryService inventoryService, String filePath) {
         this.inventoryService = inventoryService;
         this.filePath = filePath;
-        loadLastTransactionState(); 
+        loadLastTransactionState();
     }
 
     /**
@@ -35,9 +37,10 @@ public class CheckoutService {
     /**
      * Finalizes the sale: deducts stock, logs transaction to CSV, and updates order status.
      */
+    // Handles finishSale logic
     public void finishSale(Order currentOrder, PaymentMethods paymentMethod, double cashReceived) {
         currentOrder.ensureOrderId();
-        transactionId++; 
+        transactionId++;
 
         java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy~HH:mm:ss");
         String timestamp = LocalDateTime.now().format(formatter);
@@ -51,7 +54,6 @@ public class CheckoutService {
         }
 
         try {
-            // Deduct items from inventory
             for (OrderItem item : currentOrder.getItems()) {
                 Product p = item.getProduct();
                 inventoryService.decreaseProductStock(p.getID(), item.getQtd());
@@ -67,32 +69,30 @@ public class CheckoutService {
                     writer.newLine();
                 }
 
-                // Write individual order items
                 for (OrderItem item : currentOrder.getItems()) {
                     Product p = item.getProduct();
 
                     String line = String.format(java.util.Locale.US, "%d,%d,%d,%s,%d,%.2f,%.2f",
-                            transactionId,              
-                            orderId,                    
-                            p.getID(),                  
-                            p.getName(),                
-                            item.getQtd(),              
-                            p.getPrice(),               
-                            item.getSubtotal()          
+                            transactionId,
+                            orderId,
+                            p.getID(),
+                            p.getName(),
+                            item.getQtd(),
+                            p.getPrice(),
+                            item.getSubtotal()
                     );
                     writer.write(line);
                     writer.newLine();
                 }
 
-                // Write transaction footer summary
                 String changeLine = String.format(java.util.Locale.US, "%c,%d,%s,%d,%s,%.2f,%.2f",
-                        'f',                      
-                        transactionId,                  
-                        timestamp,                      
-                        orderId,                        
-                        paymentMethod.name(),           
-                        cartCost,                       
-                        change                          
+                        'f',
+                        transactionId,
+                        timestamp,
+                        orderId,
+                        paymentMethod.name(),
+                        cartCost,
+                        change
                 );
                 writer.write(changeLine);
                 writer.newLine();
@@ -109,6 +109,7 @@ public class CheckoutService {
     /**
      * Parses the CSV file on startup to resume transaction and order IDs sequentially.
      */
+    // Handles loadLastTransactionState logic
     private void loadLastTransactionState() {
         File file = new File(this.filePath);
         if (!file.exists() || file.length() == 0) {
@@ -143,6 +144,7 @@ public class CheckoutService {
         }
     }
 
+    // Handles calculateChange logic
     public double calculateChange(double cartCost, double cashReceived) {
         return (cashReceived - cartCost);
     }

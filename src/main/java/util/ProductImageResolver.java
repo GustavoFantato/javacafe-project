@@ -10,9 +10,11 @@ public final class ProductImageResolver {
 
     private static final String DEFAULT_IMAGE_PATH = "images/products/default.jpg";
 
+    // Handles ProductImageResolver logic
     private ProductImageResolver() {
     }
 
+    // Handles load logic
     public static Image load(String imagePath, double requestedWidth, double requestedHeight) {
         String resolvedPath = normalizePath(imagePath);
         Image image = tryLoad(resolvedPath, requestedWidth, requestedHeight);
@@ -23,10 +25,12 @@ public final class ProductImageResolver {
         return fallback != null ? fallback : new WritableImage(1, 1);
     }
 
+    // Handles defaultImagePath logic
     public static String defaultImagePath() {
         return DEFAULT_IMAGE_PATH;
     }
 
+    // Handles normalizePath logic
     private static String normalizePath(String imagePath) {
         if (imagePath == null || imagePath.isBlank()) {
             return DEFAULT_IMAGE_PATH;
@@ -38,6 +42,7 @@ public final class ProductImageResolver {
         return normalizedPath;
     }
 
+    // Handles tryLoad logic
     private static Image tryLoad(String imagePath, double requestedWidth, double requestedHeight) {
         try {
             if (imagePath.startsWith("http://") || imagePath.startsWith("https://") || imagePath.startsWith("file:")) {
@@ -54,11 +59,11 @@ public final class ProductImageResolver {
                 return buildImage(file.toURI().toString(), requestedWidth, requestedHeight);
             }
         } catch (Exception ignored) {
-            // Usa a imagem padrao quando o caminho configurado falha.
         }
         return null;
     }
 
+    // Handles buildImage logic
     private static Image buildImage(String source, double requestedWidth, double requestedHeight) {
         Image image = new Image(source, requestedWidth, requestedHeight, true, true, false);
         return image.isError() ? null : image;

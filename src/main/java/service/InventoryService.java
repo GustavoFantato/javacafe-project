@@ -12,6 +12,7 @@ import java.util.List;
 /**
  * Manages the product catalog, stock levels, and handles inventory CSV persistence.
  */
+// Main class for inventoryservice related behavior
 public class InventoryService {
 
     private static final String CSV_HEADER =
@@ -20,6 +21,7 @@ public class InventoryService {
     private List<Product> storageList;
     private final String filePath;
 
+    // Handles InventoryService logic
     public InventoryService(String filePath) {
         this.filePath = filePath;
         this.storageList = new ArrayList<>();
@@ -29,6 +31,7 @@ public class InventoryService {
     /**
      * Loads the entire inventory from the storage CSV into memory.
      */
+    // Handles loadInventory logic
     public void loadInventory() {
         this.storageList.clear();
 
@@ -61,6 +64,7 @@ public class InventoryService {
     /**
      * Overwrites the CSV file with the current state of the inventory list in memory.
      */
+    // Handles saveInventory logic
     public void saveInventory() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.filePath))) {
             writer.write(CSV_HEADER);
@@ -89,6 +93,7 @@ public class InventoryService {
         }
     }
 
+    // Handles getNextProductId logic
     public int getNextProductId() {
         int maxId = 0;
         for (Product p : storageList) {
@@ -97,6 +102,7 @@ public class InventoryService {
         return maxId + 1;
     }
 
+    // Handles getLowStockProducts logic
     public List<Product> getLowStockProducts() {
         List<Product> lowStock = new ArrayList<>();
         for (Product p : storageList) {
@@ -118,6 +124,7 @@ public class InventoryService {
         }
     }
 
+    // Handles increaseProductStock logic
     public void increaseProductStock(int id, int qtd) {
         Product p = findProductById(id);
 
@@ -129,6 +136,7 @@ public class InventoryService {
         }
     }
 
+    // Handles findProductByCategoryFilter logic
     public List<Product> findProductByCategoryFilter(List<Product> baseList, Category category) {
         List<Product> filtered = new ArrayList<>();
         for (Product p : baseList) {
@@ -139,6 +147,7 @@ public class InventoryService {
         return filtered;
     }
 
+    // Handles findProductByNameFilter logic
     public List<Product> findProductByNameFilter(List<Product> baseList, String name) {
         List<Product> filtered = new ArrayList<>();
         for (Product p : baseList) {
@@ -149,6 +158,7 @@ public class InventoryService {
         return filtered;
     }
 
+    // Handles findProductBySizeFilter logic
     public List<Product> findProductBySizeFilter(List<Product> baseList, Size size) {
         List<Product> filtered = new ArrayList<>();
         for (Product p : baseList) {
@@ -159,6 +169,7 @@ public class InventoryService {
         return filtered;
     }
 
+    // Handles findProductByPriceFilter logic
     public List<Product> findProductByPriceFilter(List<Product> baseList, double price, FilterOperator operator) {
         List<Product> filtered = new ArrayList<>();
 
@@ -185,6 +196,7 @@ public class InventoryService {
         return filtered;
     }
 
+    // Handles addProductStorage logic
     public void addProductStorage(Product newProd) {
         if (isWellFormatedProduct(newProd)) {
             storageList.add(newProd);
@@ -195,6 +207,7 @@ public class InventoryService {
         }
     }
 
+    // Handles removeProductStorage logic
     public void removeProductStorage(int id) {
         Product p = findProductById(id);
 
@@ -207,6 +220,7 @@ public class InventoryService {
         }
     }
 
+    // Handles updateProductStorage logic
     public void updateProductStorage(Product updatedProd) {
         if (!isWellFormatedProduct(updatedProd)) {
             System.err.println("[Inventory] FAIL: Cannot update. Product contains formatting errors!");
@@ -233,14 +247,17 @@ public class InventoryService {
         System.out.println("[Inventory] LOG: Product ID " + updatedProd.getID() + " updated successfully!");
     }
 
+    // Handles getStorageList logic
     public List<Product> getStorageList() {
         return storageList;
     }
 
+    // Handles getFilePath logic
     public String getFilePath() {
         return filePath;
     }
 
+    // Handles parseLine logic
     private Product parseLine(String line) {
         try {
             String[] tokens = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
@@ -272,6 +289,7 @@ public class InventoryService {
         }
     }
 
+    // Handles findProductById logic
     public Product findProductById(int id) {
         for (Product p : storageList) {
             if (p.getID() == id) {
@@ -281,6 +299,7 @@ public class InventoryService {
         return null;
     }
 
+    // Handles isWellFormatedProduct logic
     public boolean isWellFormatedProduct(Product p) {
         if (p == null) {
             System.err.println("[Inventory] VALIDATION FAIL: Product object is null.");

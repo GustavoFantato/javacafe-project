@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
 
+// Main class for receiptservice related behavior
 public class ReceiptService {
 
     private static final DateTimeFormatter RECEIPT_TIME =
@@ -66,6 +67,7 @@ public class ReceiptService {
         return sb.toString();
     }
 
+    // Handles offerReceiptActions logic
     public void offerReceiptActions(String receiptContent, Stage owner) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Venda finalizada");
@@ -90,6 +92,7 @@ public class ReceiptService {
         }
     }
 
+    // Handles saveReceipt logic
     public void saveReceipt(String content, Stage owner) {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Salvar cupom");
@@ -111,6 +114,7 @@ public class ReceiptService {
         }
     }
 
+    // Handles printReceipt logic
     public void printReceipt(String content, Stage owner) {
         PrinterJob job = PrinterJob.createPrinterJob();
         if (job == null || !job.showPrintDialog(owner)) {
@@ -130,6 +134,7 @@ public class ReceiptService {
         }
     }
 
+    // Handles translatePayment logic
     private String translatePayment(PaymentMethods method) {
         return switch (method) {
             case CASH -> "Dinheiro";
@@ -138,6 +143,7 @@ public class ReceiptService {
         };
     }
 
+    // Handles truncate logic
     private String truncate(String value, int max) {
         if (value.length() <= max) {
             return value;
@@ -145,6 +151,7 @@ public class ReceiptService {
         return value.substring(0, max - 1) + "…";
     }
 
+    // Handles showInfo logic
     private void showInfo(Stage owner, String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
@@ -154,6 +161,7 @@ public class ReceiptService {
         alert.showAndWait();
     }
 
+    // Handles showError logic
     private void showError(Stage owner, String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);

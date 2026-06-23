@@ -18,9 +18,11 @@ public final class ProductImageStorage {
     private static final Set<String> ALLOWED_EXTENSIONS =
             Set.of(".jpg", ".jpeg", ".png", ".gif", ".webp");
 
+    // Handles ProductImageStorage logic
     private ProductImageStorage() {
     }
 
+    // Handles isInternalPath logic
     public static boolean isInternalPath(String imagePath) {
         if (imagePath == null || imagePath.isBlank()) {
             return false;
@@ -100,6 +102,7 @@ public final class ProductImageStorage {
         return extension;
     }
 
+    // Handles slugify logic
     private static String slugify(String productName) {
         String normalized = Normalizer.normalize(productName == null ? "" : productName, Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", "")
